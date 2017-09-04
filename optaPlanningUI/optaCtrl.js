@@ -9,8 +9,10 @@ angular.module('myApp', []).controller('namesCtrl', function($scope,$http) {
     $scope.submitXml = function(){
         var task = $scope.task;
         $http({method:'POST',url: 'http://localhost:8081/api/opta/submitXml',data:task}).then(function(response) {
-            $scope.problemIds = response.data.DATA;
-            $scope.problemId = $scope.problemIds[0]; 
+            $scope.employees = response.data.DATA.emplyees;
+            $scope.tasksList = response.data.DATA.tasklist;
+  //          $scope.problemIds = response.data.DATA;
+//            $scope.problemId = $scope.problemIds[0]; 
         });
     };
     

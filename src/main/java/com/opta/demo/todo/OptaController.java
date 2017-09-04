@@ -31,9 +31,9 @@ public final class OptaController {
 
     @RequestMapping(value = "/submitXml",method = RequestMethod.POST)
     Map<String ,Object> submitXml(@RequestBody Map requestData) {
-    	if(!requestData.containsKey("id") || (String)requestData.get("id")=="" || !requestData.containsKey("xml") || (String)requestData.get("xml")=="") return ResponseHandler.generateResponse("planning id doesn't exist", HttpStatus.NOT_ACCEPTABLE, true, optaservice.getAllPlanning());
+    	/*if(!requestData.containsKey("id") || (String)requestData.get("id")=="" || !requestData.containsKey("xml") || (String)requestData.get("xml")=="") return ResponseHandler.generateResponse("planning id doesn't exist", HttpStatus.NOT_ACCEPTABLE, true, optaservice.getAllPlanning());
     	optaservice.submitXmltoKie(requestData);
-    	return ResponseHandler.generateResponse("save Data sucessFully", HttpStatus.ACCEPTED, false, optaservice.getAllPlanning());
+    	*/return ResponseHandler.generateResponse("save Data sucessFully", HttpStatus.ACCEPTED, false,optaservice.getsolutionbyXml((String)requestData.get("xml")));// optaservice.getAllPlanning());
     }
     
     
@@ -54,7 +54,7 @@ public final class OptaController {
     
     @RequestMapping(value = "/deleteKieContainer", method = RequestMethod.POST)
     Map<String ,Object> deleteKieContainer(@RequestParam String id) {
-    	optaPlannerService.deleteKieContainer(id);
+    	//optaPlannerService.deleteKieContainer(id);
     	return ResponseHandler.generateResponse("save Data sucessFully", HttpStatus.ACCEPTED, false, null);
     }
     

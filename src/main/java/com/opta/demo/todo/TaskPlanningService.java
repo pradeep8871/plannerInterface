@@ -144,14 +144,14 @@ public class TaskPlanningService {
 		XStream xStream = new XStream();
 		xStream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
 		String xml = xStream.toXML(taskPlanningSolution);
-		/*try {
+		try {
 			PrintWriter out = new PrintWriter("/media/pradeep/bak/multiOpta/optaPlanningTask/unplannedTask.xml");
 			out.println(xml);
 			out.close();
 			System.out.println("file complete");
 		} catch (FileNotFoundException ex) {
 			System.out.println(ex.getMessage());
-		}*/
+		}
 		return xml;
 	}
 
@@ -179,6 +179,43 @@ public class TaskPlanningService {
 		}
 		taskPlanningSolution.setLocationList(locations);
 		taskPlanningSolution.setTaskList(tasks);
+	}
+
+	public Map getsolutionbyXml(String xml) {
+		XStream xstream = new XStream();
+		xstream.processAnnotations(TaskPlanningSolution.class);
+		xstream.ignoreUnknownElements();
+		xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
+		TaskPlanningSolution solution = (TaskPlanningSolution) xstream.fromXML(xml);
+		/*
+		 * PlanningProblem planningProblem = getPlanningProblemByid(id);
+		 * planningProblem.setStatus(PlanningStatus.SOLVED);
+		 * optaRepository.save(planningProblem);
+		 */List<Map> updatedEmployees = new ArrayList<Map>();
+		List<Map> tasks = new ArrayList<>();
+		int i = 1;
+		for (Employee emp : solution.getEmployeeList()) {
+			Map<String, Object> map = new HashMap<>();
+			makeEmployeeList(tasks, emp.getNextTask());
+			map.put("employeeName", emp.getName());
+			map.put("employeeNumber", i);
+			map.put("employeeId", emp.getId());
+			if (!emp.getAvailabilityList().isEmpty())
+				map.put("availableTime", emp.getAvailabilityList().get(0));
+			map.put("nextTasks", tasks);
+			tasks = new ArrayList<>();
+			updatedEmployees.add(map);
+			i++;
+		}
+		List<Task> tasksList = new ArrayList<>();
+		for (Task task : solution.getTaskList()) {
+			if(task.getEmployee()==null)
+				tasksList.add(task);
+		}
+		Map<String,Object> resp = new HashMap<>();
+		resp.put("tasklist", tasksList);
+		resp.put("emplyees", updatedEmployees);
+		return resp;
 	}
 
 	private Location getLocationWithDistanceData(List<LocationDistance> locationDistances, Location location) {
@@ -215,7 +252,7 @@ public class TaskPlanningService {
 			map.put("taskName", nextTask.getTaskName());
 			map.put("startTime", nextTask.getStartTime());
 			map.put("endTime", nextTask.getEndTime());
-			map.put("arrivaltime", nextTask.getDurationIncludingArrivalTime());
+			map.put("arrivaltime", nextTask.getDurationIncludingArrivalTime() - nextTask.getDuration());
 			tasks.add(map);
 			makeEmployeeList(tasks, nextTask.getNextTask());
 		}
@@ -232,7 +269,8 @@ public class TaskPlanningService {
 
 	public List<Map> getSolutionById(String id) {
 		String xml = optaPlannerService.getSolutionFromKieServer(id);
-		if(!xml.contains("NOT_SOLVING")) return null;
+		if (!xml.contains("NOT_SOLVING"))
+			return null;
 		String solutionString = "<com.kairos.planning.solution.TaskPlanningSolution>"
 				+ (xml.substring(xml.indexOf("<vehicleList>"), xml.indexOf("</solver-instance>")))
 						.replace("</best-solution>", "</com.kairos.planning.solution.TaskPlanningSolution>");
@@ -253,7 +291,8 @@ public class TaskPlanningService {
 			map.put("employeeName", emp.getName());
 			map.put("employeeNumber", i);
 			map.put("employeeId", emp.getId());
-			if(!emp.getAvailabilityList().isEmpty())map.put("availableTime", emp.getAvailabilityList().get(0));
+			if (!emp.getAvailabilityList().isEmpty())
+				map.put("availableTime", emp.getAvailabilityList().get(0));
 			map.put("nextTasks", tasks);
 			tasks = new ArrayList<>();
 			updatedEmployees.add(map);

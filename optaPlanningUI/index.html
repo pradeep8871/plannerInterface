@@ -52,6 +52,20 @@
                         </div>
                     </div>
                 </div>
+                <div>
+                                <ul ng-repeat="task in tasksList">
+                                    <li>
+                                        <div>
+                                            <span>{{task.id}}</span>
+                                            <span>{{task.taskName}}</span>
+                                            <span>{{task.startTime}} - {{task.endTime}}</span>
+                                        </div>
+
+                                        
+                                    </li>
+                                </ul>
+
+                            </div>
             </div>
         </div>
         <script src="optaCtrl.js"></script>
