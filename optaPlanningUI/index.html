@@ -40,10 +40,16 @@
                                                 <div class="task-box">
 
                                                     <span class="task-time">{{task.startTime | date:'HH:mm:ss'}} - {{task.endTime | date:'HH:mm:ss'}}</span>
-                                                    <span class="task-id">{{task.id}}{{task.taskName}}</span>
+                                                    <span class="task-id">{{task.id}}{{task.taskName}}{{task.citizenName}}</span>{{task.timeReachToUnit}}
                                                 </div>
                                             </li>
+                                          
                                         </ul>
+                                          <div class="last-box" ng-show="task.timeReachToUnit">
+                                                <span>ichieh</span>
+
+                                            </div>
+
                                     </li>
                                 </ul>
 
@@ -53,19 +59,19 @@
                     </div>
                 </div>
                 <div>
-                                <ul ng-repeat="task in tasksList">
-                                    <li>
-                                        <div>
-                                            <span>{{task.id}}</span>
-                                            <span>{{task.taskName}}</span>
-                                            <span>{{task.startTime}} - {{task.endTime}}</span>
-                                        </div>
-
-                                        
-                                    </li>
-                                </ul>
-
+                    <ul ng-repeat="task in tasksList">
+                        <li>
+                            <div>
+                                <span>{{task.id}}</span>
+                                <span>{{task.taskName}}</span>
+                                <span>{{task.startTime}} - {{task.endTime}}</span>
                             </div>
+
+
+                        </li>
+                    </ul>
+
+                </div>
             </div>
         </div>
         <script src="optaCtrl.js"></script>

@@ -192,31 +192,49 @@ public class TaskPlanningService {
 		 * planningProblem.setStatus(PlanningStatus.SOLVED);
 		 * optaRepository.save(planningProblem);
 		 */List<Map> updatedEmployees = new ArrayList<Map>();
+		 List<Map> tasksList = new ArrayList<>();
 		List<Map> tasks = new ArrayList<>();
+		List<Map> unAvailableEmp = new ArrayList<>();
 		int i = 1;
 		for (Employee emp : solution.getEmployeeList()) {
+			if(emp.getNextTask()!=null && emp.getAvailabilityList().size()>0){
 			Map<String, Object> map = new HashMap<>();
 			makeEmployeeList(tasks, emp.getNextTask());
 			map.put("employeeName", emp.getName());
 			map.put("employeeNumber", i);
 			map.put("employeeId", emp.getId());
-			if (!emp.getAvailabilityList().isEmpty())
-				map.put("availableTime", emp.getAvailabilityList().get(0));
+			map.put("availableTime", emp.getAvailabilityList().get(0));
 			map.put("nextTasks", tasks);
 			tasks = new ArrayList<>();
 			updatedEmployees.add(map);
 			i++;
+			}
+			else{
+				Map<String,Object> map = new HashMap<>();
+				map.put("employeeName", emp.getName());
+				map.put("employeeNumber", i);
+				map.put("employeeId", emp.getId());
+				unAvailableEmp.add(map);
+			}
 		}
-		List<Task> tasksList = new ArrayList<>();
 		for (Task task : solution.getTaskList()) {
-			if(task.getEmployee()==null)
-				tasksList.add(task);
+			if(task.getEmployee()==null){
+				Map<String,Object> map = new HashMap<>();
+				map.put("id", task.getId());
+				map.put("taskName", task.getTaskName());
+				map.put("citizenName", task.getCitizen().getName());
+				map.put("startTime", task.getStartTime());
+				map.put("endTime", task.getEndTime());
+				tasksList.add(map);
+			}
 		}
 		Map<String,Object> resp = new HashMap<>();
-		resp.put("tasklist", tasksList);
+		resp.put("unassignTask", tasksList);
+		resp.put("unavailableEmployees", unAvailableEmp);
 		resp.put("emplyees", updatedEmployees);
 		return resp;
 	}
+	
 
 	private Location getLocationWithDistanceData(List<LocationDistance> locationDistances, Location location) {
 		List<LocationInfo> locationInfos = new ArrayList<>();
@@ -250,6 +268,7 @@ public class TaskPlanningService {
 			Map<String, Object> map = new HashMap<>();
 			map.put("id", nextTask.getId());
 			map.put("taskName", nextTask.getTaskName());
+			map.put("citizenName", nextTask.getCitizen().getName());
 			map.put("startTime", nextTask.getStartTime());
 			map.put("endTime", nextTask.getEndTime());
 			map.put("arrivaltime", nextTask.getDurationIncludingArrivalTime() - nextTask.getDuration());
