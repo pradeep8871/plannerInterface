@@ -1,0 +1,53 @@
+angular.module('myApp', []).controller('namesCtrl', function($scope,$http) {
+    $scope.firstName = "pradeep";
+    
+    $scope.unplanned = {};
+    $scope.tasks = [];
+    $scope.employees = [];
+    $scope.showSecond = false;
+    
+    $scope.saveData = function(){
+ 
+        $http({method:'POST',url: 'http://localhost:8080/api/opta',data:$scope.unplanned}).then(function(response) {
+            $scope.showSecond = true;
+            for(var i=0;i<10;i++){
+                $scope.tasks.push("pradeep"+i);
+                $scope.employees.push("vipul"+i);
+            }
+        });
+        
+    };
+    
+    $scope.getInitData = function(){
+        $http({method:'GET',url: 'http://localhost:8080/api/opta'}).then(function(response) {
+            $scope.greeting = response.data;
+        });
+        
+    };
+    
+    $scope.updateData = function(){
+        $http({method:'POST',url: 'http://localhost:8080/api/opta'}).then(function(response) {
+            $scope.greeting = response.data;
+        });
+        
+    };
+    
+    $scope.deleteData = function(){
+        $http({method:'POST',url: 'http://localhost:8080/api/opta'}).then(function(response) {
+            $scope.greeting = response.data;
+        });
+        
+    };
+    
+    $scope.getPlannedSolution = function(){
+        $http({method:'POST',url: 'http://localhost:8080/api/opta'}).then(function(response) {
+            $scope.greeting = response.data;
+        });
+        
+    };
+    
+    
+    
+    
+    
+});

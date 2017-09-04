@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="style.css"/>
+    <body>
+
+        <div ng-app="myApp" ng-controller="namesCtrl">
+            <div class="container" ng-show="!employees.length"><textarea class="form-control" rows="25" placeholder="XML" ng-model="task.xml"></textarea>
+                <div class="divbutton">
+                    <input type="text" ng-model="task.id" placeholder="Id">
+                    <input class="button" type="button" value="submit" ng-click="submitXml();">
+                    <select class="button" ng-show="problemIds.length>0" ng-model="problemId" ng-options="id.planningId for id in problemIds">
+                    </select>
+                    <input class="button" type="button" ng-show="problemIds.length>0" value="Status" ng-click="getStatus();">
+                    <input class="button" type="button" ng-show="problemIds.length>0" value="Solution" ng-click="getSolution();">
+                    <input class="button" type="button" ng-show="false" value="Location" ng-click="makeLocationData();">
+                    <span class="status">{{planningProblem.status}}</span>
+                </div>
+            </div>
+
+            <div ng-show="employees.length>0">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="staff-info-box clearfix">
+                                <ul class="staff-list clearfix" ng-repeat="emp in employees">
+                                    <li>
+                                        <div class="staff-name">
+                                            <span class="number">{{emp.employeeNumber}}</span>
+                                            <span>{{emp.employeeName}}</span>
+                                            <span>{{emp.availableTime.startTimeString}} - {{emp.availableTime.endTimeString}}</span>
+                                        </div>
+
+                                        <ul class="staff-task-list" ng-repeat="task in emp.nextTasks">
+                                            <li>
+                                                <div class="task-duration-box">
+                                                    <span class="task-duration">{{task.arrivaltime}} min</span>
+                                                </div>
+                                                <div class="task-box">
+
+                                                    <span class="task-time">{{task.startTime | date:'HH:mm:ss'}} - {{task.endTime | date:'HH:mm:ss'}}</span>
+                                                    <span class="task-id">{{task.id}}{{task.taskName}}</span>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="optaCtrl.js"></script>
+
+    </body>
+</html>
