@@ -253,6 +253,7 @@ public class TaskPlanningService {
 			map.put("startTime", nextTask.getStartTime());
 			map.put("endTime", nextTask.getEndTime());
 			map.put("arrivaltime", nextTask.getDurationIncludingArrivalTime() - nextTask.getDuration());
+			if(nextTask.getNextTask()==null) map.put("timeReachToUnit", nextTask.getTimeToReachBackUnit());
 			tasks.add(map);
 			makeEmployeeList(tasks, nextTask.getNextTask());
 		}
