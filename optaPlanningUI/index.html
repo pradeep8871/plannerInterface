@@ -29,7 +29,7 @@
                                         <div class="staff-name">
                                             <span class="number">{{emp.employeeNumber}}</span>
                                             <span>{{emp.employeeName}}</span>
-                                            <span>{{emp.availableTime.startTimeString}} - {{emp.availableTime.endTimeString}}</span><span></span>
+                                            <span>{{emp.availableTime.startTimeString}} - {{emp.availableTime.endTimeString}}</span><span ng-show="false">{{emp.employeeLocation.latitude}}-{{emp.employeeLocation.longitude}}</span>
                                         </div>
 
                                         <ul class="staff-task-list" ng-repeat="task in emp.nextTasks">
@@ -41,7 +41,7 @@
 
                                                     <span class="task-time">{{task.startTime | date:'HH:mm:ss'}} - {{task.endTime | date:'HH:mm:ss'}}</span>
                                                     <span class="task-id">{{task.id}}{{task.taskName}}{{task.citizenName}}</span>{{task.timeReachToUnit}}
-                                                    <span></span>
+                                                    <span ng-show="false">{{task.taskLocation.latitude}}-{{task.taskLocation.longitude}}</span>
                                                 </div>
                                             </li>
                                           
