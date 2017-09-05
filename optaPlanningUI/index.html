@@ -63,7 +63,7 @@
                                     <li>
                                         <span class="number">{{emp.employeeNumber}}</span>
                                         <div class="staff-name">
-                                            <span>{{emp.employeeName}}</span>
+                                            <span>{{emp.employeeName}}, V={{emp.vehicleId}}</span>,
                                             <span>{{emp.availableTime.startTimeString}} - {{emp.availableTime.endTimeString}}</span><span ng-show="false">{{emp.employeeLocation.latitude}}-{{emp.employeeLocation.longitude}}</span>
                                         </div>
 
@@ -73,9 +73,9 @@
                                                     <span class="task-duration">{{task.arrivaltime}} min</span>
                                                 </div>
                                                 <div class="task-box">
-
+                                                    <span ng-show="false">{{task.hardcontrants}}</span>
                                                     <span class="task-time">{{task.startTime | date:'HH:mm:ss'}} - {{task.endTime | date:'HH:mm:ss'}}</span>
-                                                    <span class="task-id">{{task.id}},{{task.taskName}},{{task.citizenName}}</span>{{task.timeReachToUnit}}
+                                                    <span class="task-id">{{task.id}},{{task.taskName}},{{task.citizenName}}</span>
                                                     <span ng-show="false">{{task.taskLocation.latitude}}-{{task.taskLocation.longitude}}</span>
                                                 </div>
                                             </li>
