@@ -1,18 +1,51 @@
 package com.kairos.planning.domain;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
+import org.optaplanner.core.api.domain.variable.PlanningVariable;
+import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @XStreamAlias("Task")
+//@PlanningEntity(difficultyComparatorClass = TaskDifficultyComparator.class)
 public class Task  extends TaskOrEmployee {
-
+	Logger log= LoggerFactory.getLogger(this.getClass());
 	private TaskType taskType;
-	private TaskOrEmployee previousTaskOrEmployee;
+	// Planning variables: changes during planning, between score calculations.
+    @PlanningVariable(valueRangeProviderRefs = {"taskRange","employeeRange"},
+            graphType = PlanningVariableGraphType.CHAINED)
+    private TaskOrEmployee previousTaskOrEmployee;
+    //@AnchorShadowVariable(sourceVariableName = "previousTaskOrEmployee")
+    //@CustomShadowVariable(variableListenerClass = LocationVariableUpdaterListener.class,
+     //      sources = {@PlanningVariableReference(variableName = "previousTaskOrVehicle")})
+   // private Vehicle vehicle;
     private String taskName;
+
+	public Long[] getBrokenHardConstraints() {
+		return brokenHardConstraints;
+	}
+	public Long getBrokenHardConstraintsSum() {
+		Long sum=0l;
+		if(brokenHardConstraints!=null){
+			sum=Arrays.stream(brokenHardConstraints).mapToLong(Long::longValue).sum();
+		}
+		return sum;
+	}
+
+	public void setBrokenHardConstraints(Long[] brokenHardConstraints) {
+		this.brokenHardConstraints = brokenHardConstraints;
+	}
+
+	private Long[] brokenHardConstraints;
+
     
     
     
@@ -33,6 +66,8 @@ public class Task  extends TaskOrEmployee {
 		this.employee = employee;
 	}
 
+	//@PlanningVariable(valueRangeProviderRefs = {"employeeRange"})
+	@AnchorShadowVariable(sourceVariableName = "previousTaskOrEmployee")
 	private Employee employee;
     private String routeId;
 
@@ -181,6 +216,32 @@ public class Task  extends TaskOrEmployee {
 	public Interval getInterval(){
     	return new Interval(new DateTime(startTime),new DateTime(endTime));
 	}
+	public Interval waitingInterval() {
+		DateTime start= null, end=null;
+		if (previousTaskOrEmployee instanceof Task) {
+			start=new DateTime(((Task) previousTaskOrEmployee).getEndTime());
+			end=new DateTime(this.getStartTime()).minusMinutes(getReachingTime());
+			//return new Interval(new DateTime(((Task) previousTaskOrEmployee).getEndTime()), new DateTime(this.getStartTime()).minusMinutes(getReachingTime()));
+		} else {
+			if (((Employee) previousTaskOrEmployee).getEarliestStartTime() == null) {
+				start=new DateTime(getStartTime());
+				end=new DateTime(getEndTime());
+				//return new Interval(new DateTime(getStartTime()), new DateTime(getEndTime()));
+			} else {
+				start=new DateTime(((Employee) previousTaskOrEmployee).getEarliestStartTime());
+				end=new DateTime(this.getStartTime()).minusMinutes(getReachingTime());
+				//return new Interval(new DateTime(((Employee) previousTaskOrEmployee).getEarliestStartTime()), new DateTime(this.getStartTime()).minusMinutes(getReachingTime()));
+			}
+		}
+		if(start!=null && start.isBefore(end)){
+			return new Interval(start,end);
+		}else{
+			return null;
+		}
+	}
+		public Long waitingMinutes(){
+			return waitingInterval()==null?0l:(long)(waitingInterval().toDuration().toStandardMinutes().getMinutes());
+	}
 	public Interval getIntervalIncludingArrival(){
 		DateTime taskStartTimeIncludingDriving= previousTaskOrEmployee instanceof Task?new DateTime(((Task) previousTaskOrEmployee).getEndTime()):null;
 		DateTime taskEndTime=new DateTime(endTime);
@@ -241,7 +302,7 @@ public class Task  extends TaskOrEmployee {
 		return previousTaskOrEmployee.getLocation().getDistanceFrom(this.getLocation());
 	}
 	public String toString(){
-		return "T:"+id+"-"+priority+"-"+getDuration()+"-"+location.getName();//+"-"+taskType.getRequiredSkillList();
+		return "T:"+id+"-"+priority+"-"+getDuration()+"-";//+"-"+taskType.getRequiredSkillList();
 	}
 	public int getMissingSkillCount() {
         if (employee==null) {
@@ -292,6 +353,12 @@ public class Task  extends TaskOrEmployee {
     public boolean canAssignedEmployeeWork(){
 		return employee!=null && employee.canWorkThisInterval(this.getIntervalIncludingArrival());
 	}
+	public long getMinutesExceedingAvailability(){
+    	return employee==null?0l: employee.getExceedingMinutesForTaskInterval(this.getIntervalIncludingArrival());
+	}
+	public long getMinutesExceedingAvailabilityForReachingUnit(){
+		return employee==null?0l: employee.getExceedingMinutesForTaskInterval(getIntervalToReachBack());
+	}
 	public boolean canAssignedEmployeeReachBack(){
 		return (!isLastTaskOfRoute() || employee.canWorkThisInterval(getIntervalToReachBack()));
 	}
@@ -324,4 +391,3 @@ public class Task  extends TaskOrEmployee {
 		this.routeId = routeId;
 	}
 }
-
