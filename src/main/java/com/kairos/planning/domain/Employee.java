@@ -5,7 +5,10 @@ import java.util.*;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
+@PlanningEntity
 @XStreamAlias("Employee")
 public class Employee extends TaskOrEmployee{
 	public Employee() {
@@ -26,6 +29,7 @@ public class Employee extends TaskOrEmployee{
 
 	private Location location;
 	private String name;
+	@PlanningVariable(valueRangeProviderRefs = {"vehicleRange"})
 	private Vehicle vehicle;
 	private Set<Skill> skillSet;
 	public Set<Skill> getSkillSet() {
@@ -34,7 +38,7 @@ public class Employee extends TaskOrEmployee{
 	public void setSkillSet(Set<Skill> skillSet) {
 		this.skillSet = skillSet;
 	}
-	//private Map<Citizen, Affinity> affinityMap= new LinkedHashMap<Citizen, Affinity>();
+	private Map<Citizen, Affinity> affinityMap= new LinkedHashMap<Citizen, Affinity>();
 	private List<AvailabilityRequest> availabilityList;
 	
 	private List<UnavailabilityRequest> unavailabilityRequests;
@@ -52,12 +56,12 @@ public class Employee extends TaskOrEmployee{
 	public void setAvailabilityList(List<AvailabilityRequest> availabilityList) {
 		this.availabilityList = availabilityList;
 	}
-	/*public Map<Citizen, Affinity> getAffinityMap() {
+	public Map<Citizen, Affinity> getAffinityMap() {
 		return affinityMap;
 	}
 	public void setAffinityMap(Map<Citizen, Affinity> affinityMap) {
 		this.affinityMap = affinityMap;
-	}*/
+	}
 
 	public Long getId() {
 		return id;
@@ -72,7 +76,7 @@ public class Employee extends TaskOrEmployee{
 		this.name = name;
 	}
 	public Long getAvailableMinutes(){
-		long mins=0;
+		long mins=0l;
 		for(AvailabilityRequest availabilityRequest:availabilityList){
 			mins+=availabilityRequest.getMinutes();
 		}
@@ -84,6 +88,16 @@ public class Employee extends TaskOrEmployee{
 			availability.append(availabilityRequest.getIntervalAsString());
 		});
 		return availability.append("]").toString();
+	}
+	public DateTime getEarliestStartTime(){
+		DateTime earliestStart= null;
+		for(AvailabilityRequest availabilityRequest:availabilityList){
+			if(earliestStart!=null && earliestStart.isBefore(availabilityRequest.getStartDateTime())){
+				continue;
+			}
+			earliestStart=availabilityRequest.getStartDateTime();
+		}
+		return earliestStart;
 	}
 	
 	public String toString(){
@@ -144,5 +158,20 @@ public class Employee extends TaskOrEmployee{
 			overlaps=true;
 		}
 		return overlaps;
+	}
+	public long getExceedingMinutesForTaskInterval(Interval taskInterval){
+		long exceedingMins=0l;
+		boolean matched=false;
+		for (AvailabilityRequest availabilityRequest : availabilityList) {
+			if(availabilityRequest.getInterval().overlaps(taskInterval)){
+				exceedingMins=taskInterval.toDuration().getStandardMinutes() - (availabilityRequest.getInterval().overlap(taskInterval).toDuration().getStandardMinutes());
+				matched=true;
+				break;
+			}
+		}
+		if(!matched){
+			exceedingMins=taskInterval.toDuration().getStandardMinutes();
+		}
+		return exceedingMins;
 	}
 }

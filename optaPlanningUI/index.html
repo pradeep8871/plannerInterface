@@ -30,27 +30,27 @@
                         </thead>
                         <tbody>
                           <tr>
-                            <td>Total Task</td>
+                            <td>1.Total Task</td>
                             <td>{{taskListSize}}</td>
                           </tr>
                              <tr>
-                            <td>Total Vehicle</td>
+                            <td>2.Total Vehicle</td>
                             <td>{{vehicleList}}</td>
                           </tr>
                              <tr>
-                            <td>Total Employee</td>
+                            <td>3.Total Employee</td>
                             <td>{{employeeList}}</td>
                           </tr>
                             <tr>
-                            <td>Total Unassign</td>
+                            <td>4.Total Unassign</td>
                             <td>{{unassigntasksList}}</td>
                           </tr>
                              <tr>
-                            <td>Assign Employee</td>
+                            <td>5.Assign Employee</td>
                             <td>{{assignedEmp}}</td>
                           </tr>
                              <tr>
-                            <td>UnAssign-Employee</td>
+                            <td>6.UnAssign-Employee</td>
                             <td>{{unAssignEmp}}</td>
                           </tr>
                              
@@ -75,7 +75,7 @@
                                                 <div class="task-box">
 
                                                     <span class="task-time">{{task.startTime | date:'HH:mm:ss'}} - {{task.endTime | date:'HH:mm:ss'}}</span>
-                                                    <span class="task-id">{{task.id}}{{task.taskName}}{{task.citizenName}}</span>{{task.timeReachToUnit}}
+                                                    <span class="task-id">{{task.id}},{{task.taskName}},{{task.citizenName}}</span>{{task.timeReachToUnit}}
                                                     <span ng-show="false">{{task.taskLocation.latitude}}-{{task.taskLocation.longitude}}</span>
                                                 </div>
                                             </li>
