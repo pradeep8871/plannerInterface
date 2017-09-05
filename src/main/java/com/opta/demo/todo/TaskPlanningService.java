@@ -231,6 +231,13 @@ public class TaskPlanningService {
 			}
 		}
 		Map<String,Object> resp = new HashMap<>();
+		resp.put("taskListSize", solution.getTaskList().size());
+		resp.put("citizenList", solution.getCitizenList().size());
+		resp.put("employeeList", solution.getEmployeeList().size());
+		resp.put("locationList", solution.getLocationList().size());
+		resp.put("vehicleList", solution.getVehicleList().size());
+		resp.put("assignedEmp", updatedEmployees.size());
+		resp.put("unAssignEmp", unAvailableEmp.size());
 		resp.put("unassignTask", tasksList);
 		resp.put("unavailableEmployees", unAvailableEmp);
 		resp.put("emplyees", updatedEmployees);
