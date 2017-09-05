@@ -203,6 +203,7 @@ public class TaskPlanningService {
 			map.put("employeeName", emp.getName());
 			map.put("employeeNumber", i);
 			map.put("employeeId", emp.getId());
+			map.put("employeeLocation", emp.getLocation());
 			map.put("availableTime", emp.getAvailabilityList().get(0));
 			map.put("nextTasks", tasks);
 			tasks = new ArrayList<>();
@@ -218,9 +219,10 @@ public class TaskPlanningService {
 			}
 		}
 		for (Task task : solution.getTaskList()) {
-			if(task.getEmployee()==null){
+			if(task.getEmployee().getAvailabilityList().size()==0){
 				Map<String,Object> map = new HashMap<>();
 				map.put("id", task.getId());
+				map.put("taskLocation", task.getLocation());
 				map.put("taskName", task.getTaskName());
 				map.put("citizenName", task.getCitizen().getName());
 				map.put("startTime", task.getStartTime());
@@ -271,6 +273,7 @@ public class TaskPlanningService {
 			map.put("citizenName", nextTask.getCitizen().getName());
 			map.put("startTime", nextTask.getStartTime());
 			map.put("endTime", nextTask.getEndTime());
+			map.put("taskLocation", nextTask.getLocation());
 			map.put("arrivaltime", nextTask.getDurationIncludingArrivalTime() - nextTask.getDuration());
 			if(nextTask.getNextTask()==null) map.put("timeReachToUnit", nextTask.getTimeToReachBackUnit());
 			tasks.add(map);
