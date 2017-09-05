@@ -202,6 +202,7 @@ public class TaskPlanningService {
 			makeEmployeeList(tasks, emp.getNextTask());
 			map.put("employeeName", emp.getName());
 			map.put("employeeNumber", i);
+			map.put("vehicleId", emp.getVehicle()==null?0:emp.getVehicle().getId());
 			map.put("employeeId", emp.getId());
 			map.put("employeeLocation", emp.getLocation());
 			map.put("availableTime", emp.getAvailabilityList().get(0));
@@ -279,6 +280,8 @@ public class TaskPlanningService {
 			map.put("taskName", nextTask.getTaskName());
 			map.put("citizenName", nextTask.getCitizen().getName());
 			map.put("startTime", nextTask.getStartTime());
+			map.put("brokenhardcontrants", nextTask.getBrokenHardConstraintsSum()>0);
+			map.put("hardcontrants", nextTask.getBrokenHardConstraints());
 			map.put("endTime", nextTask.getEndTime());
 			map.put("taskLocation", nextTask.getLocation());
 			map.put("arrivaltime", nextTask.getDurationIncludingArrivalTime() - nextTask.getDuration());
