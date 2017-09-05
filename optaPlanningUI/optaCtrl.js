@@ -16,6 +16,7 @@ angular.module('myApp', []).controller('namesCtrl', function($scope,$http) {
            // $scope.citizenList = response.data.DATA.citizenList;
             $scope.vehicleList = response.data.DATA.vehicleList;
             $scope.employeeList = response.data.DATA.employeeList;
+            $scope.unassigntasksList = response.data.DATA.unassignTask.length;
             $scope.assignedEmp = response.data.DATA.assignedEmp;
             $scope.unAssignEmp = response.data.DATA.unAssignEmp;
   //          $scope.problemIds = response.data.DATA;
