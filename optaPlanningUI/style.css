@@ -137,4 +137,7 @@ body {
 .unassigned-task .table, .table-details .table {
     font-size: 13px;
 }
+.taskHardContraints{
+    background: rgb(255, 236, 236) !important;
+}
  

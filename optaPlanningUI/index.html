@@ -30,27 +30,27 @@
                         </thead>
                         <tbody>
                           <tr>
-                            <td>1.Total Task</td>
+                            <td>1.Total Tasks</td>
                             <td>{{taskListSize}}</td>
                           </tr>
                              <tr>
-                            <td>2.Total Vehicle</td>
+                            <td>2.Total Vehicles</td>
                             <td>{{vehicleList}}</td>
                           </tr>
                              <tr>
-                            <td>3.Total Employee</td>
+                            <td>3.Total Employees</td>
                             <td>{{employeeList}}</td>
                           </tr>
                             <tr>
-                            <td>4.Total Unassign</td>
+                            <td>4.Total Unassigned</td>
                             <td>{{unassigntasksList}}</td>
                           </tr>
                              <tr>
-                            <td>5.Assign Employee</td>
+                            <td>5.Available Employees</td>
                             <td>{{assignedEmp}}</td>
                           </tr>
                              <tr>
-                            <td>6.UnAssign-Employee</td>
+                            <td>6.UnAssigned-Employees</td>
                             <td>{{unAssignEmp}}</td>
                           </tr>
                              
@@ -70,9 +70,9 @@
                                         <ul class="staff-task-list" ng-repeat="task in emp.nextTasks">
                                             <li>
                                                 <div class="task-duration-box">
-                                                    <span class="task-duration">{{task.arrivaltime}} min</span>
-                                                </div>
-                                                <div class="task-box">
+                                                    <span class="task-duration">{{task.arrivaltime}} min,{{task.waitingtime}} min</span>
+                                                </div><!--//task.brokenhardcontrants-->
+                                                <div class="task-box" ng-class="{'taskHardContraints': task.brokenhardcontrants==true}">
                                                     <span ng-show="false">{{task.hardcontrants}}</span>
                                                     <span class="task-time">{{task.startTime | date:'HH:mm:ss'}} - {{task.endTime | date:'HH:mm:ss'}}</span>
                                                     <span class="task-id">{{task.id}},{{task.taskName}},{{task.citizenName}}</span>
@@ -80,7 +80,7 @@
                                                 </div>
                                             </li>
                                           <div class="last-box" ng-show="task.timeReachToUnit>=0">
-                                                <span>{{task.timeReachToUnit}}</span>
+                                                <span>{{task.timeReachToUnit}} min</span>
                                         </div>
                                         </ul>
                                           
@@ -129,6 +129,7 @@
                             <th>Citizen Name</th>
                             <th>Start Time</th>
                             <th>End Time</th>
+                              <th>Reason</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -139,6 +140,7 @@
                             <td>{{task.citizenName}}</td>
                             <td>{{task.startTime | date:'HH:mm:ss'}}</td>
                             <td>{{task.endTime | date:'HH:mm:ss'}}</td>
+                               <td>{{getReasonByTask(task.hardcontrants)}}</td>
                           </tr>
                         </tbody>
                       </table>
