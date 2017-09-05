@@ -202,7 +202,7 @@ public class TaskPlanningService {
 			makeEmployeeList(tasks, emp.getNextTask());
 			map.put("employeeName", emp.getName());
 			map.put("employeeNumber", i);
-			map.put("vehicleId", emp.getVehicle()==null?0:emp.getVehicle().getId());
+			map.put("vehicleId", emp.getVehicle()==null?-1:emp.getVehicle().getId());
 			map.put("employeeId", emp.getId());
 			map.put("employeeLocation", emp.getLocation());
 			map.put("availableTime", emp.getAvailabilityList().get(0));
@@ -220,9 +220,10 @@ public class TaskPlanningService {
 			}
 		}
 		for (Task task : solution.getTaskList()) {
-			if(task.getEmployee().getAvailabilityList().size()==0){
+			if(task.getEmployee()==null){
 				Map<String,Object> map = new HashMap<>();
 				map.put("id", task.getId());
+				map.put("hardcontrants", task.getBrokenHardConstraints());
 				map.put("taskLocation", task.getLocation());
 				map.put("taskName", task.getTaskName());
 				map.put("citizenName", task.getCitizen().getName());
@@ -239,6 +240,7 @@ public class TaskPlanningService {
 		resp.put("vehicleList", solution.getVehicleList().size());
 		resp.put("assignedEmp", updatedEmployees.size());
 		resp.put("unAssignEmp", unAvailableEmp.size());
+		resp.put("unassignTaskList", tasksList.size());
 		resp.put("unassignTask", tasksList);
 		resp.put("unavailableEmployees", unAvailableEmp);
 		resp.put("emplyees", updatedEmployees);
@@ -284,7 +286,8 @@ public class TaskPlanningService {
 			map.put("hardcontrants", nextTask.getBrokenHardConstraints());
 			map.put("endTime", nextTask.getEndTime());
 			map.put("taskLocation", nextTask.getLocation());
-			map.put("arrivaltime", nextTask.getDurationIncludingArrivalTime() - nextTask.getDuration());
+			map.put("arrivaltime", nextTask.getReachingTime());
+			map.put("waitingtime", nextTask.waitingMinutes());
 			if(nextTask.getNextTask()==null) map.put("timeReachToUnit", nextTask.getTimeToReachBackUnit());
 			tasks.add(map);
 			makeEmployeeList(tasks, nextTask.getNextTask());
