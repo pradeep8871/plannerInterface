@@ -72,7 +72,7 @@
                                                 <div class="task-duration-box">
                                                     <span class="task-duration">{{task.arrivaltime}} min,{{task.waitingtime}} min</span>
                                                 </div><!--//task.brokenhardcontrants-->
-                                                <div class="task-box" ng-class="{'taskHardContraints': task.brokenhardcontrants==true}">
+                                                <div class="task-box" ng-class="{'taskHardContraints': task.brokenhardcontrants}">
                                                     <span ng-show="false">{{task.hardcontrants}}</span>
                                                     <span class="task-time">{{task.startTime | date:'HH:mm:ss'}} - {{task.endTime | date:'HH:mm:ss'}}</span>
                                                     <span class="task-id">{{task.id}},{{task.taskName}},{{task.citizenName}}</span>
@@ -136,7 +136,7 @@
                           <tr ng-repeat="task in tasksList">
                             <td>{{task.id}}</td>
                             <td>{{task.taskName}}</td>
-                            <td>{{task.taskLocation.latitude}}{{task.taskLocation.longitude}}</td>
+                            <td>{{task.taskLocation.latitude}},{{task.taskLocation.longitude}}</td>
                             <td>{{task.citizenName}}</td>
                             <td>{{task.startTime | date:'HH:mm:ss'}}</td>
                             <td>{{task.endTime | date:'HH:mm:ss'}}</td>

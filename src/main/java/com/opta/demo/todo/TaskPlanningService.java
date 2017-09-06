@@ -282,7 +282,7 @@ public class TaskPlanningService {
 			map.put("taskName", nextTask.getTaskName());
 			map.put("citizenName", nextTask.getCitizen().getName());
 			map.put("startTime", nextTask.getStartTime());
-			map.put("brokenhardcontrants", nextTask.getBrokenHardConstraintsSum()>0);
+			map.put("brokenhardcontrants", nextTask.getBrokenHardConstraintsSum()<0);
 			map.put("hardcontrants", nextTask.getBrokenHardConstraints());
 			map.put("endTime", nextTask.getEndTime());
 			map.put("taskLocation", nextTask.getLocation());
