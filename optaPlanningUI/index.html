@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html style="height: 100%;">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8y3XyNnZEQfub_Lww9CzLTVzFAqKKMXQ"></script>
     <link type="text/css" rel="stylesheet" href="bootstrap.min.css"/>
     <link type="text/css" rel="stylesheet" href="style.css"/>
-    <body>
+    <body style="height: 100%;">
 
         <div ng-app="myApp" ng-controller="namesCtrl">
             <div class="container" ng-show="!employees.length"><textarea class="form-control" rows="25" placeholder="XML" ng-model="task.xml"></textarea>
@@ -12,142 +13,120 @@
                     <input class="button" type="button" value="submit" ng-click="submitXml();">
                     <select class="button" ng-show="problemIds.length>0" ng-model="problemId" ng-options="id.planningId for id in problemIds">
                     </select>
+                   
                     <input class="button" type="button" ng-show="problemIds.length>0" value="Status" ng-click="getStatus();">
                     <input class="button" type="button" ng-show="problemIds.length>0" value="Solution" ng-click="getSolution();">
                     <input class="button" type="button" ng-show="false" value="Location" ng-click="makeLocationData();">
+                    
                     <span class="status">{{planningProblem.status}}</span>
                 </div>
             </div>
 
-            <div ng-show="employees.length>0">
+            <div ng-show="employees.length>0 && !mapShow">
                 <div class="table-details">
-                <table class="table table-bordered">
+                    <table class="table table-bordered">
                         <thead>
-                          <tr>
-                            <th>Details</th>
-                            <th>Number</th>
-                          </tr>
+                            <tr>
+                                <th>Details</th>
+                                <th>Number</th>
+                            </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td>1.Total Tasks</td>
-                            <td>{{taskListSize}}</td>
-                          </tr>
-                             <tr>
-                            <td>2.Total Vehicles</td>
-                            <td>{{vehicleList}}</td>
-                          </tr>
-                             <tr>
-                            <td>3.Total Employees</td>
-                            <td>{{employeeList}}</td>
-                          </tr>
                             <tr>
-                            <td>4.Total Unassigned Tasks</td>
-                            <td>{{unassigntasksList}}</td>
-                          </tr>
-                             <tr>
-                            <td>5.Available Employees</td>
-                            <td>{{assignedEmp}}</td>
-                          </tr>
-                             <tr>
-                            <td>6.UnAssigned-Employees</td>
-                            <td>{{unAssignEmp}}</td>
-                          </tr>
-                             
+                                <td>1.Total Tasks</td>
+                                <td>{{taskListSize}}</td>
+                            </tr>
+                            <tr>
+                                <td>2.Total Vehicles</td>
+                                <td>{{vehicleList}}</td>
+                            </tr>
+                            <tr>
+                                <td>3.Total Employees</td>
+                                <td>{{employeeList}}</td>
+                            </tr>
+                            <tr>
+                                <td>4.Total Unassigned Tasks</td>
+                                <td>{{unassigntasksList}}</td>
+                            </tr>
+                            <tr>
+                                <td>5.Available Employees</td>
+                                <td>{{assignedEmp}}</td>
+                            </tr>
+                            <tr>
+                                <td>6.UnAssigned-Employees</td>
+                                <td>{{unAssignEmp}}</td>
+                            </tr>
+
                         </tbody>
-                      </table>
+                    </table>
                 </div>
-                
-                            <div class="staff-info-box clearfix">
-                                <ul class="staff-list clearfix" ng-repeat="emp in employees">
-                                    <li>
-                                        <span class="number">{{emp.employeeNumber}}</span>
-                                        <div class="staff-name">
-                                            <span>{{emp.employeeName}}, V={{emp.vehicleId}}</span>,
-                                            <span>{{emp.availableTime.startTimeString}} - {{emp.availableTime.endTimeString}}</span><span ng-show="false">{{emp.employeeLocation.latitude}}-{{emp.employeeLocation.longitude}}</span>
-                                        </div>
 
-                                        <ul class="staff-task-list" ng-repeat="task in emp.nextTasks">
-                                            <li>
-                                                <div class="task-duration-box">
-                                                    <span class="task-duration">{{task.arrivaltime}} min,{{task.waitingtime}} min</span>
-                                                </div><!--//task.brokenhardcontrants-->
-                                                <div class="task-box" ng-class="{'taskHardContraints': task.brokenhardcontrants}">
-                                                    <span ng-show="false">{{task.hardcontrants}}</span>
-                                                    <span class="task-time">{{task.startTime | date:'HH:mm:ss'}} - {{task.endTime | date:'HH:mm:ss'}}</span>
-                                                    <span class="task-id">{{task.id}},{{task.taskName}},{{task.citizenName}}</span>
-                                                    <span ng-show="false">{{task.taskLocation.latitude}}-{{task.taskLocation.longitude}}</span>
-                                                </div>
-                                            </li>
-                                          <div class="last-box" ng-show="task.timeReachToUnit>=0">
-                                                <span>{{task.timeReachToUnit}} min</span>
-                                        </div>
-                                        </ul>
-                                          
-
-                                    </li>
-                                </ul>
-
-                            </div>
-
-                <div>
-<!--
-                    <ul ng-repeat="task in tasksList">
+                <div class="staff-info-box clearfix" ng-show="!mapShow">
+                    <ul class="staff-list clearfix" ng-repeat="emp in employees">
                         <li>
-                            <div>
-                                <span>{{task.id}}</span>
-                                <span>{{task.taskName}}</span>
-                                <span>{{task.taskLocation.latitude}}{{task.taskLocation.longitude}}</span>
-                                <span>{{task.citizenName}}</span>
-                                <span>{{task.startTime}} - {{task.endTime}}</span>
+                            <!--<a><span class="number" ng-click="getMapByEmployee();">{{emp.employeeNumber}}</span></a>-->
+                            <div class="staff-name"> <!--<a><span ng-click="getMap();">pradeep</span></a>-->
+                                <a><span ng-click="getMap(emp);">{{emp.employeeName}}, V={{emp.vehicleId}}</span></a>,
+                                <span>{{emp.availableTime.startTimeString}} - {{emp.availableTime.endTimeString}}</span><span ng-show="false">{{emp.employeeLocation.latitude}}-{{emp.employeeLocation.longitude}}</span>
                             </div>
+
+                            <ul class="staff-task-list" ng-repeat="task in emp.nextTasks">
+                                <li>
+                                    <div class="task-duration-box">
+                                        <span class="task-duration">{{task.arrivaltime}} min,{{task.waitingtime}} min</span>
+                                    </div><!--//task.brokenhardcontrants-->
+                                    <div class="task-box" ng-class="{'taskHardContraints': task.brokenhardcontrants}">
+                                        <span ng-show="false">{{task.hardcontrants}}</span>
+                                        <span class="task-time">{{task.startTime | date:'HH:mm:ss'}} - {{task.endTime | date:'HH:mm:ss'}}</span>
+                                        <span class="task-id">{{task.id}},{{task.taskName}},{{task.citizenName}}</span>
+                                        <span ng-show="false">{{task.taskLocation.latitude}}-{{task.taskLocation.longitude}}</span>
+                                    </div>
+                                </li>
+                                <div class="last-box" ng-show="task.timeReachToUnit>=0">
+                                    <span>{{task.timeReachToUnit}} min</span>
+                                </div>
+                            </ul>
 
 
                         </li>
                     </ul>
--->
-                     <!--<ul ng-repeat="emp in unavailableEmpl">
-                        <li>
-                            <div>
-                                <span>{{emp.id}}</span>
-                                <span>{{emp.employeeName}}</span>
-                                <span>{{emp.startTime}} - {{emp.endTime}}</span>
-                            </div>
-
-
-                        </li>
-                    </ul>-->
-                    
-                    <div class="unassigned-task">
-                        <h4 class="heading">unassigned tasks</h4>
-                      <table class="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th>Id</th>
-                            <th>Task Nane</th>
-                            <th>Location</th>
-                            <th>Citizen Name</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                              <th>Reason</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr ng-repeat="task in tasksList">
-                            <td>{{task.id}}</td>
-                            <td>{{task.taskName}}</td>
-                            <td>{{task.taskLocation.latitude}},{{task.taskLocation.longitude}}</td>
-                            <td>{{task.citizenName}}</td>
-                            <td>{{task.startTime | date:'HH:mm:ss'}}</td>
-                            <td>{{task.endTime | date:'HH:mm:ss'}}</td>
-                               <td>{{getReasonByTask(task.hardcontrants)}}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
 
                 </div>
+               
+
+               <!-- <div>
+                    <div class="unassigned-task">
+                        <h4 class="heading">unassigned tasks</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Task Nane</th>
+                                    <th>Location</th>
+                                    <th>Citizen Name</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="task in tasksList">
+                                    <td>{{task.id}}</td>
+                                    <td>{{task.taskName}}</td>
+                                    <td>{{task.taskLocation.latitude}},{{task.taskLocation.longitude}}</td>
+                                    <td>{{task.citizenName}}</td>
+                                    <td>{{task.startTime | date:'HH:mm:ss'}}</td>
+                                    <td>{{task.endTime | date:'HH:mm:ss'}}</td>
+                                    <td>{{getReasonByTask(task.hardcontrants)}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>-->
+                
             </div>
+             <div ng-show="mapShow" id="map"></div>
         </div>
         <script src="optaCtrl.js"></script>
 

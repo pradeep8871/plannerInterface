@@ -2,6 +2,14 @@
     margin: 0;
     padding: 0;
 }
+#map {
+  height: 100%;
+    overflow: visible !important;
+    position: inherit !important;
+ /* width: 100%;
+  margin: 0px;
+  padding: 0px*/
+}
 .status{
     margin-left: 25%;
 }
