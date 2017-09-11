@@ -59,13 +59,6 @@ angular.module('myApp', []).controller('namesCtrl', function($scope,$http) {
         var map;
         var directionsDisplay;
         var directionsService = new google.maps.DirectionsService();
-        /*var locations = [
-            ['Noida', 28.5355, 77.3910, 2],
-            ['gurgaon', 28.4595, 77.0266, 4],
-            ['Delhi',28.7041, 77.1025, 5],
-            ['Rohtak', 28.8955, 76.6066, 1],
-            ['Plawal', 28.1487, 77.3320, 3]
-        ];*/
 
         directionsDisplay = new google.maps.DirectionsRenderer();
 

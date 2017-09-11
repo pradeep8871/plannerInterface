@@ -66,8 +66,8 @@
                         <li>
                             <!--<a><span class="number" ng-click="getMapByEmployee();">{{emp.employeeNumber}}</span></a>-->
                             <div class="staff-name"> <!--<a><span ng-click="getMap();">pradeep</span></a>-->
-                                <a><span ng-click="getMap(emp);">{{emp.employeeName}}, V={{emp.vehicleId}}</span></a>,
-                                <span>{{emp.availableTime.startTimeString}} - {{emp.availableTime.endTimeString}}</span><span ng-show="false">{{emp.employeeLocation.latitude}}-{{emp.employeeLocation.longitude}}</span>
+                                <a><span ng-click="getMap(emp);">{{emp.employeeName}}</span></a>, V={{emp.vehicleId}},
+                                <span>{{emp.availableTime.startTimeString}} - {{emp.availableTime.endTimeString}}, TaskAssigned = {{emp.nextTasks.length}}</span><span ng-show="false">{{emp.employeeLocation.latitude}}-{{emp.employeeLocation.longitude}}</span>
                             </div>
 
                             <ul class="staff-task-list" ng-repeat="task in emp.nextTasks">
@@ -94,8 +94,8 @@
                 </div>
                
 
-               <!-- <div>
-                    <div class="unassigned-task">
+                <div>
+                    <div ng-show="!mapShow" class="unassigned-task">
                         <h4 class="heading">unassigned tasks</h4>
                         <table class="table table-bordered">
                             <thead>
@@ -123,9 +123,10 @@
                         </table>
                     </div>
 
-                </div>-->
+                </div>
                 
             </div>
+            <a class="back" ng-show="mapShow" ng-click="mapShow=false"><span>Back</span></a>
              <div ng-show="mapShow" id="map"></div>
         </div>
         <script src="optaCtrl.js"></script>
