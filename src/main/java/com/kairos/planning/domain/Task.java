@@ -1,14 +1,12 @@
 package com.kairos.planning.domain;
 
 import java.util.Arrays;
-import java.util.Date;
 
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
-import org.optaplanner.core.api.domain.variable.PlanningVariable;
-import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
+import org.optaplanner.core.api.domain.variable.*;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.slf4j.Logger;
@@ -23,10 +21,6 @@ public class Task  extends TaskOrEmployee {
     @PlanningVariable(valueRangeProviderRefs = {"taskRange","employeeRange"},
             graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrEmployee previousTaskOrEmployee;
-    //@AnchorShadowVariable(sourceVariableName = "previousTaskOrEmployee")
-    //@CustomShadowVariable(variableListenerClass = LocationVariableUpdaterListener.class,
-     //      sources = {@PlanningVariableReference(variableName = "previousTaskOrVehicle")})
-   // private Vehicle vehicle;
     private String taskName;
 
 	public Long[] getBrokenHardConstraints() {
@@ -72,6 +66,7 @@ public class Task  extends TaskOrEmployee {
     private String routeId;
 
     public Task() {
+       // this.plannedStartTime=this.initialStartTime;
     }
 
     public Task(Long id, TaskOrEmployee previousTaskOrEmployee, Vehicle vehicle, int duration, Location location, Integer priority, TaskType taskType) {
@@ -97,47 +92,63 @@ public class Task  extends TaskOrEmployee {
    // @CustomShadowVariable(variableListenerClass = TaskChangeListener.class,
 	 //      sources = {@PlanningVariableReference(variableName = "previousTaskOrVehicle")})
     private Route route;
-  //  @PlanningVariable(valueRangeProviderRefs = {"employeeRange"} )
-   // private Employee employee;
-	@XStreamAlias("startTime")
-	private Date startTime;
-	@XStreamAlias("endTime")
-    private Date endTime;
+	//@XStreamAlias("initialStartTime")
+   // @XStreamConverter(TaskPlanningGenerator.JodaTimeConverter.class)
+	private DateTime initialStartTime;
+   // @XStreamConverter(TaskPlanningGenerator.JodaTimeConverter.class)
+    private DateTime initialEndTime;
 
-	public Date getStartTime() {
-		return startTime;
+	/*
+	This is sum of reaching time and waiting time
+	 */
+    public DateTime getPlannedStartTime() {
+        return plannedStartTime;
+    }
+    public Interval getPlannedInterval() {
+        return new Interval(plannedStartTime, plannedStartTime.plusMinutes(duration));
+    }
+    public DateTime getPlannedEndTime() {
+        return plannedStartTime.plusMinutes(duration);
+    }
+
+    public void setPlannedStartTime(DateTime plannedStartTime) {
+        this.plannedStartTime = plannedStartTime;
+    }
+ //   @CustomShadowVariable(variableListenerClass = StartTimeVariableListener.class,
+         //  sources = {@PlanningVariableReference(variableName = "previousTaskOrEmployee")})
+    private DateTime plannedStartTime;
+
+
+	public DateTime getInitialStartTime() {
+		return initialStartTime;
 	}
 
-	public void setStartTime(Date startTime) {
-		this.startTime = startTime;
+	public void setInitialStartTime(DateTime initialStartTime) {
+		this.initialStartTime = initialStartTime;
 	}
 
-	public Date getEndTime() {
-		return endTime;
+	public DateTime getInitialEndTime() {
+		return initialEndTime;
 	}
 
-	public void setEndTime(Date endTime) {
-		this.endTime = endTime;
+	public void setInitialEndTime(DateTime initialEndTime) {
+		this.initialEndTime = initialEndTime;
 	}
-
-	public Integer getEarlyStartMinutes() {
-		return earlyStartMinutes;
+    public DateTime getEarliestStartTime() {
+        return initialStartTime.minusMinutes((int) slaDuration);
+    }
+	public DateTime getLatestStartTime() {
+		return initialStartTime.plusMinutes((int) slaDuration);
 	}
+    public Interval getPossibleStartInterval() {
+        return new Interval(getEarliestStartTime(),getLatestStartTime());
+    }
+    public boolean isPlannedInPossibleInterval(){
+	    return getPossibleStartInterval().contains(getPlannedStartTime());
+    }
 
-	public void setEarlyStartMinutes(Integer earlyStartMinutes) {
-		this.earlyStartMinutes = earlyStartMinutes;
-	}
-
-	private Integer earlyStartMinutes;
-    private boolean locked;
+	private boolean locked;
     private int indexInTaskType;
-    private int readyTime;
-	public int getReadyTime() {
-		return readyTime;
-	}
-	public void setReadyTime(int readyTime) {
-		this.readyTime = readyTime;
-	}
 	public int getIndexInTaskType() {
 		return indexInTaskType;
 	}
@@ -150,16 +161,6 @@ public class Task  extends TaskOrEmployee {
 	public void setLocked(boolean locked) {
 		this.locked = locked;
 	}
-	/*public Employee getEmployee() {
-		return employee;
-	}
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
-	}*/
-	/*@Override
-	public Vehicle getVehicle() {
-		return vehicle;
-	}*/
 	public TaskType getTaskType() {
 		return taskType;
 	}
@@ -199,58 +200,56 @@ public class Task  extends TaskOrEmployee {
 	}
 	
     public String getLabel(){
-    	return id+"_"+priority+"_"+new DateTime(getStartTime()).toString("HH:mm")+"_"+new DateTime(getEndTime()).toString("HH:mm");
+    	return id+"_"+priority+"_("+initialStartTime.toString("HH:mm")+"_"+initialEndTime.toString("HH:mm")+")P:"
+				+plannedStartTime.toString("HH:mm")+"_"+getPlannedEndTime().toString("HH:mm")+"PiD:"+","+getIntervalIncludingArrivalAndWaiting().getStart().toString("HH:mm")+"_"+
+                getIntervalIncludingArrivalAndWaiting().getEnd().toString("HH:mm")+"Di:"+getDrivingMinutesFromPreviousTaskOrEmployee();
     }
-    private long duration;
-    public long getDuration() {
 
-		//return  taskType==null?0:taskType.getBaseDuration().intValue();
-		//return (int)ChronoUnit.MINUTES.between(LocalDateTime.ofInstant(startTime.toInstant(), ZoneId.systemDefault()),
-		//		LocalDateTime.ofInstant(endTime.toInstant(), ZoneId.systemDefault()));
-		return getInterval().toDuration().getStandardMinutes();
+	public void setDuration(Integer duration) {
+		this.duration = duration;
+	}
+
+	private Integer duration;
+
+	public Integer getSlaDuration() {
+		return slaDuration;
+	}
+
+	public void setSlaDuration(Integer slaDuration) {
+		this.slaDuration = slaDuration;
+	}
+
+	private Integer slaDuration;
+    public Integer getDuration() {
+		//return getInterval().toDuration().getStandardMinutes();
+		return duration;
 	}
 	public Long getDurationIncludingArrivalTime(){
-		//return getDuration()+getReachingTime();
-		return getIntervalIncludingArrival().toDuration().getStandardMinutes();
+		return getIntervalIncludingArrivalAndWaiting().toDuration().getStandardMinutes();
 	}
-	public Interval getInterval(){
-    	return new Interval(new DateTime(startTime),new DateTime(endTime));
+	public Interval getInitialInterval(){
+    	return new Interval(new DateTime(initialStartTime),new DateTime(initialEndTime));
 	}
-	public Interval waitingInterval() {
-		DateTime start= null, end=null;
-		if (previousTaskOrEmployee instanceof Task) {
-			start=new DateTime(((Task) previousTaskOrEmployee).getEndTime());
-			end=new DateTime(this.getStartTime()).minusMinutes(getReachingTime());
-			//return new Interval(new DateTime(((Task) previousTaskOrEmployee).getEndTime()), new DateTime(this.getStartTime()).minusMinutes(getReachingTime()));
-		} else {
-			if (((Employee) previousTaskOrEmployee).getEarliestStartTime() == null) {
-				start=new DateTime(getStartTime());
-				end=new DateTime(getEndTime());
-				//return new Interval(new DateTime(getStartTime()), new DateTime(getEndTime()));
-			} else {
-				start=new DateTime(((Employee) previousTaskOrEmployee).getEarliestStartTime());
-				end=new DateTime(this.getStartTime()).minusMinutes(getReachingTime());
-				//return new Interval(new DateTime(((Employee) previousTaskOrEmployee).getEarliestStartTime()), new DateTime(this.getStartTime()).minusMinutes(getReachingTime()));
-			}
-		}
-		if(start!=null && start.isBefore(end)){
-			return new Interval(start,end);
-		}else{
-			return null;
-		}
+		public Integer getWaitingMinutes(){
+			return getPlannedReachingTime().isAfter(getEarliestStartTime())?0:new Interval(getPlannedReachingTime(),getEarliestStartTime()).toDuration().toStandardMinutes().getMinutes();
 	}
-		public Long waitingMinutes(){
-			return waitingInterval()==null?0l:(long)(waitingInterval().toDuration().toStandardMinutes().getMinutes());
-	}
-	public Interval getIntervalIncludingArrival(){
-		DateTime taskStartTimeIncludingDriving= previousTaskOrEmployee instanceof Task?new DateTime(((Task) previousTaskOrEmployee).getEndTime()):null;
-		DateTime taskEndTime=new DateTime(endTime);
+	public Interval getIntervalIncludingArrivalAndWaiting(){
+
+		/*if(this.getId().equals(2210575l) && previousTaskOrEmployee instanceof  Task && ((Task)previousTaskOrEmployee).getId().equals(2008028l)){
+			System.out.println("?????????"+getDistanceFrom(previousTaskOrEmployee)+","+employee.getVehicle() .getSpeedKmpm()+","+getDistanceFrom(previousTaskOrEmployee) / employee.getVehicle() .getSpeedKmpm());
+		}*/
+		//TODO: this can not just be end time of last task
+		/*DateTime taskStartTimeIncludingDriving= null;//previousTaskOrEmployee instanceof Task?new DateTime(((Task) previousTaskOrEmployee).getEndTime()):null;
+		DateTime taskEndTime=getPlannedEndTime();
 		if(taskStartTimeIncludingDriving==null || !taskStartTimeIncludingDriving.isBefore(taskEndTime)){
-			taskStartTimeIncludingDriving=new DateTime(startTime).minusMinutes(getReachingTime());
-		}
+			taskStartTimeIncludingDriving=new DateTime(initialStartTime).minusMinutes((int)(getDrivingMinutesFromPreviousTaskOrEmployee())
+			);
+		}*/
 		//DateTime taskStartTimeIncludingDriving=previousTaskOrVehicle instanceof Vehicle?new DateTime(startTime).minusMinutes(getReachingTime()):
 		//		new DateTime(((Task)previousTaskOrVehicle).getEndTime());
-		return new Interval(taskStartTimeIncludingDriving,taskEndTime);
+        //Interval initalInterval = getInitialInterval();
+        Interval interval = new Interval(getPlannedStartTime().minusMinutes(getDrivingMinutesFromPreviousTaskOrEmployee()+getWaitingMinutes()) ,getPlannedEndTime());
+		return interval;
 	}
 	private Location location;
 
@@ -268,7 +267,7 @@ public class Task  extends TaskOrEmployee {
 		return location;
 	}
 	
-	public long getDistanceFromPreviousTaskOrEmployee() {
+	public Long getDistanceFromPreviousTaskOrEmployee() {
         if (previousTaskOrEmployee == null) {
             throw new IllegalStateException("This method must not be called when the previousTaskOrVehicle ("
                     + previousTaskOrEmployee + ") is not initialized yet.");
@@ -276,17 +275,16 @@ public class Task  extends TaskOrEmployee {
         return getDistanceFrom(previousTaskOrEmployee);
     }
     public boolean isAfter(Task prevTask){
-		return !this.getStartTime().before(prevTask.getEndTime());
-	}
-
-	public boolean isBefore(Task prevTask){
-		return this.getStartTime().before(prevTask.getStartTime());
+		//return !this.getIntervalIncludingArrival().getStart().isBefore(prevTask.getIntervalIncludingArrival().getEnd());
+       // return !this.getIntervalIncludingArrivalAndWaiting().getStart().isBefore(prevTask.getIntervalIncludingArrivalAndWaiting().getEnd());
+        return this.getIntervalIncludingArrivalAndWaiting().getStart().isAfter(prevTask.getIntervalIncludingArrivalAndWaiting().getEnd()) ||
+                this.getIntervalIncludingArrivalAndWaiting().getStart().isEqual(prevTask.getIntervalIncludingArrivalAndWaiting().getEnd());
 	}
 
 	/*
 	In minutes
 	 */
-	public int getReachingTime() {
+	public int getDrivingMinutesFromPreviousTaskOrEmployee() {
 		if (previousTaskOrEmployee == null) {
 			throw new IllegalStateException("This method must not be called when the previousTaskOrVehicle ("
 					+ previousTaskOrEmployee + ") is not initialized yet.");
@@ -295,10 +293,21 @@ public class Task  extends TaskOrEmployee {
 			throw new IllegalStateException("This method must not be called when the vehicle ("
 					+ employee + ") is not initialized yet.");
 		}
-		int reachingTime = (int) (getDistanceFrom(previousTaskOrEmployee) / employee.getVehicle() .getSpeedKmpm());
-		return reachingTime;
+		/*if(this.getId().equals(1979693l) && previousTaskOrEmployee instanceof  Task && ((Task)previousTaskOrEmployee).getId().equals(2047751l)){
+			System.out.println("?????????"+getDistanceFrom(previousTaskOrEmployee)+","+employee.getVehicle() .getSpeedKmpm()+","+getDistanceFrom(previousTaskOrEmployee) / employee.getVehicle() .getSpeedKmpm());
+		}*/
+		int drivingTime = (int) ((getDistanceFrom(previousTaskOrEmployee) / employee.getVehicle() .getSpeedKmpm())*10);
+		return drivingTime;
 	}
-	public long getDistanceFrom(TaskOrEmployee previousTaskOrEmployee) {
+	public DateTime getPlannedReachingTime(){
+	    return previousTaskOrEmployee instanceof Task ? ((Task) previousTaskOrEmployee).getPlannedEndTime().plusMinutes(getDrivingMinutesFromPreviousTaskOrEmployee())
+                :plannedStartTime.minusMinutes(getDrivingMinutesFromPreviousTaskOrEmployee());
+    }
+	public Long getDistanceFrom(TaskOrEmployee previousTaskOrEmployee) {
+		/*if(previousTaskOrEmployee.getLocation().getId().equals(0l) && this.getLocation().getId().equals(13l) ||
+				previousTaskOrEmployee.getLocation().getId().equals(13l) && this.getLocation().getId().equals(0l)){
+			System.out.println("????????????"+previousTaskOrEmployee.getLocation().getDistanceFrom(this.getLocation()));
+		}*/
 		return previousTaskOrEmployee.getLocation().getDistanceFrom(this.getLocation());
 	}
 	public String toString(){
@@ -351,36 +360,45 @@ public class Task  extends TaskOrEmployee {
     }
 
     public boolean canAssignedEmployeeWork(){
-		return employee!=null && employee.canWorkThisInterval(this.getIntervalIncludingArrival());
+		Interval interval=this.getIntervalIncludingArrivalAndWaiting();
+		/*if(this.getId().equals(1979693l) && previousTaskOrEmployee instanceof  Task && ((Task)previousTaskOrEmployee).getId().equals(2047751l)){
+			System.out.println("?????????"+getDistanceFrom(previousTaskOrEmployee)+","+employee.getVehicle() .getSpeedKmpm()+","+getDistanceFrom(previousTaskOrEmployee) / employee.getVehicle() .getSpeedKmpm());
+		}*/
+		return employee!=null && employee.canWorkThisInterval(interval)
+				&& ((previousTaskOrEmployee instanceof Task)? !new DateTime(((Task)previousTaskOrEmployee).getInitialEndTime()).isAfter(interval.getStart()):true);
 	}
-	public long getMinutesExceedingAvailability(){
-    	return employee==null?0l: employee.getExceedingMinutesForTaskInterval(this.getIntervalIncludingArrival());
+	public Long getMinutesExceedingAvailability(){
+		/*if(this.getId().equals(2210575l) && previousTaskOrEmployee instanceof  Task && ((Task)previousTaskOrEmployee).getId().equals(2008028l)){
+			System.out.println("?????????"+getDistanceFrom(previousTaskOrEmployee)+","+employee.getVehicle() .getSpeedKmpm()+","+getDistanceFrom(previousTaskOrEmployee) / employee.getVehicle() .getSpeedKmpm());
+		}*/
+    	return employee==null?0l: employee.getExceedingMinutesForTaskInterval(this.getIntervalIncludingArrivalAndWaiting())
+				;
 	}
-	public long getMinutesExceedingAvailabilityForReachingUnit(){
-		return employee==null?0l: employee.getExceedingMinutesForTaskInterval(getIntervalToReachBack());
+	public Long getMinutesExceedingAvailabilityForReachingUnit(){
+		return employee==null?0l: employee.getExceedingMinutesForTaskInterval(getReachBackUnitInterval());
 	}
 	public boolean canAssignedEmployeeReachBack(){
-		return (!isLastTaskOfRoute() || employee.canWorkThisInterval(getIntervalToReachBack()));
+		return (!isLastTaskOfRoute() || employee.canWorkThisInterval(getReachBackUnitInterval()));
 	}
 	public boolean canEmployeeWork(Employee employee){
-		return employee!=null && employee.canWorkThisInterval(this.getIntervalIncludingArrival()) ;
+		return employee!=null && employee.canWorkThisInterval(this.getIntervalIncludingArrivalAndWaiting()) ;
 	}
 	public boolean canEmployeeReachBack(Employee employee){
-		return (!isLastTaskOfRoute() || employee.canWorkThisInterval(getIntervalToReachBack()));
+		return (!isLastTaskOfRoute() || employee.canWorkThisInterval(getReachBackUnitInterval()));
 	}
 
 	public boolean isLastTaskOfRoute(){
     	return nextTask==null;
 	}
-	public Interval getIntervalToReachBack(){
-		Interval interval = new Interval(new DateTime(endTime),new DateTime(endTime).plusMinutes(getTimeToReachBackUnit().intValue()));
+	public Interval getReachBackUnitInterval(){
+		Interval interval = new Interval(getPlannedEndTime(),getPlannedEndTime().plusMinutes(getTimeToReachBackUnit().intValue()));
 		return interval;
 	}
 	/*
 	Return minutes
 	 */
 	public Long getTimeToReachBackUnit(){
-		return (long) Math.ceil(getDistanceFrom(employee)/employee.getVehicle().getSpeedKmpm());
+		return Math.round(getDistanceFrom(employee)/employee.getVehicle().getSpeedKmpm());
 	}
 
 	public String getRouteId() {
@@ -391,3 +409,4 @@ public class Task  extends TaskOrEmployee {
 		this.routeId = routeId;
 	}
 }
+

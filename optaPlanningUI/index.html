@@ -77,8 +77,8 @@
                                     </div><!--//task.brokenhardcontrants-->
                                     <div class="task-box" ng-class="{'taskHardContraints': task.brokenhardcontrants}">
                                         <span ng-show="false">{{task.hardcontrants}}</span>
-                                        <span class="task-time">{{task.startTime | date:'HH:mm:ss'}} - {{task.endTime | date:'HH:mm:ss'}}</span>
-										<span class="task-time2">P:{{task.plannedStartTime | date:'HH:mm:ss'}} - {{task.plannedEndTime | date:'HH:mm:ss'}}</span>
+                                        <span class="task-time">{{task.startTime | date:'dd-MMM|| HH:mm:ss'}} - {{task.endTime | date:'dd-MMM|| HH:mm:ss'}}</span>
+										<span class="task-time2">P:{{task.plannedStartTime | date:'dd-MMM|| HH:mm:ss'}} - {{task.plannedEndTime | date:'dd-MMM|| HH:mm:ss'}}</span>
                                         <span class="task-id">{{task.id}},{{task.taskName}},{{task.citizenName}}</span>
                                         <span ng-show="false">{{task.taskLocation.latitude}}-{{task.taskLocation.longitude}}</span>
                                     </div>

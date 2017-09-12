@@ -227,8 +227,8 @@ public class TaskPlanningService {
 				map.put("taskLocation", task.getLocation());
 				map.put("taskName", task.getTaskName());
 				map.put("citizenName", task.getCitizen().getName());
-				map.put("startTime", task.getStartTime());
-				map.put("endTime", task.getEndTime());
+				map.put("startTime", task.getInitialStartTime().toDate());
+				map.put("endTime", task.getInitialEndTime().toDate());
 				tasksList.add(map);
 			}
 		}
@@ -281,13 +281,15 @@ public class TaskPlanningService {
 			map.put("id", nextTask.getId());
 			map.put("taskName", nextTask.getTaskName());
 			map.put("citizenName", nextTask.getCitizen().getName());
-			map.put("startTime", nextTask.getStartTime());
+			map.put("startTime", nextTask.getInitialStartTime().toDate());
+			map.put("plannedStartTime", nextTask.getPlannedStartTime().toDate());
+			map.put("plannedEndTime", nextTask.getPlannedEndTime().toDate());
 			map.put("brokenhardcontrants", nextTask.getBrokenHardConstraintsSum()<0);
 			map.put("hardcontrants", nextTask.getBrokenHardConstraints());
-			map.put("endTime", nextTask.getEndTime());
+			map.put("endTime", nextTask.getInitialEndTime().toDate());
 			map.put("taskLocation", nextTask.getLocation());
-			map.put("arrivaltime", nextTask.getReachingTime());
-			map.put("waitingtime", nextTask.waitingMinutes());
+			map.put("arrivaltime", nextTask.getDrivingMinutesFromPreviousTaskOrEmployee());
+			map.put("waitingtime", nextTask.getWaitingMinutes());
 			if(nextTask.getNextTask()==null) map.put("timeReachToUnit", nextTask.getTimeToReachBackUnit());
 			tasks.add(map);
 			makeEmployeeList(tasks, nextTask.getNextTask());

@@ -134,13 +134,13 @@ public class Employee extends TaskOrEmployee{
         Interval workInterval=null;
         if(nextTask!=null){
             Task currentTask=nextTask;
-            DateTime start = currentTask.getIntervalIncludingArrival().getStart();
+            DateTime start = currentTask.getIntervalIncludingArrivalAndWaiting().getStart();
             while(currentTask!=null){
                 if(currentTask.nextTask==null) break;
                 currentTask=currentTask.nextTask;
 
             }
-            DateTime end = currentTask.getIntervalToReachBack().getEnd();
+            DateTime end = currentTask.getReachBackUnitInterval().getEnd();
             if(start.isBefore(end)){
                 workInterval= new Interval(start,end);
             }
