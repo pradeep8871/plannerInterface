@@ -50,14 +50,18 @@
                             </tr>
                             <tr>
                                 <td>5.Available Employees</td>
+                                <td>{{avialableEmp}}</td>
+                            </tr>
+                            <tr>
+                                <td>6.Assigned Employees</td>
                                 <td>{{assignedEmp}}</td>
                             </tr>
                             <tr>
-                                <td>6.UnAssigned-Employees</td>
+                                <td>7.UnAssigned-Employees</td>
                                 <td>{{unAssignEmp}}</td>
                             </tr>
                             <tr>
-                                <td>6.Optaplanner Score</td>
+                                <td>8.Optaplanner Score</td>
                                 <td>{{plannerScore}}</td>
                             </tr>
 
@@ -122,8 +126,8 @@
                                     <td>{{task.taskName}}</td>
                                     <td>{{task.taskLocation.latitude}},{{task.taskLocation.longitude}}</td>
                                     <td>{{task.citizenName}}</td>
-                                    <td>{{millisToUTCDate(task.startTime) | date:'HH:mm:ss'}}</td>
-                                    <td>{{millisToUTCDate(task.endTime) | date:'HH:mm:ss'}}</td>
+                                    <td>{{millisToUTCDate(task.startTime) | date:'dd-MMM HH:mm:ss'}}</td>
+                                    <td>{{millisToUTCDate(task.endTime) | date:'dd-MMM HH:mm:ss'}}</td>
                                     <td>{{getReasonByTask(task.hardcontrants)}}</td>
                                 </tr>
                             </tbody>

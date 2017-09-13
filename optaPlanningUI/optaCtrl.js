@@ -19,6 +19,8 @@ angular.module('myApp', []).controller('namesCtrl', function($scope,$http) {
             $scope.unassigntasksList = response.data.DATA.unassignTaskList;
             $scope.assignedEmp = response.data.DATA.assignedEmp;
             $scope.unAssignEmp = response.data.DATA.unAssignEmp;
+            $scope.avialableEmp = response.data.DATA.avialableEmp;
+            
             $scope.plannerScore = response.data.DATA.plannerScore;
         });
     };

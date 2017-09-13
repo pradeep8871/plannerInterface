@@ -199,26 +199,43 @@ public class TaskPlanningService {
 		 * PlanningProblem planningProblem = getPlanningProblemByid(id);
 		 * planningProblem.setStatus(PlanningStatus.SOLVED);
 		 * optaRepository.save(planningProblem);
-		 */List<Map> updatedEmployees = new ArrayList<Map>();
-		 List<Map> tasksList = new ArrayList<>();
-		List<Map> tasks = new ArrayList<>();
+		 */
+		List<Map> updatedEmployees = new ArrayList<Map>();
+		List<Map> availableButNotAssigned = new ArrayList<Map>();
+		List<Map> tasksList = new ArrayList<>();
+		
 		List<Map> unAvailableEmp = new ArrayList<>();
 		int i = 1;
+		int assignedEmp=0, availableEmps=0;
 		for (Employee emp : solution.getEmployeeList()) {
 			if(emp.getNextTask()!=null && emp.getAvailabilityList().size()>0){
-			Map<String, Object> map = new HashMap<>();
-			makeEmployeeList(tasks, emp.getNextTask());
-			map.put("employeeName", emp.getName());
-			map.put("employeeNumber", i);
-			map.put("vehicleId", emp.getVehicle()==null?-1:emp.getVehicle().getId());
-			map.put("employeeId", emp.getId());
-			map.put("employeeLocation", emp.getLocation());
-			map.put("availableTime", emp.getAvailabilityList().get(0));
-			map.put("plannedTime", emp.getWorkIntervalAsString());
-			map.put("nextTasks", tasks);
-			tasks = new ArrayList<>();
-			updatedEmployees.add(map);
-			i++;
+				Map<String, Object> map = new HashMap<>();
+				List<Map> tasks = new ArrayList<>();
+				makeEmployeeList(tasks, emp.getNextTask());
+				map.put("employeeName", emp.getName());
+				map.put("employeeNumber", i);
+				map.put("vehicleId", emp.getVehicle()==null?-1:emp.getVehicle().getId());
+				map.put("employeeId", emp.getId());
+				map.put("employeeLocation", emp.getLocation());
+				map.put("availableTime", emp.getAvailabilityList().get(0));
+				map.put("plannedTime", emp.getWorkIntervalAsString());
+				map.put("nextTasks", tasks);
+				updatedEmployees.add(map);
+				assignedEmp++;
+				availableEmps++;
+				i++;
+			}else if(emp.getAvailabilityList().size()>0){
+				Map<String, Object> map = new HashMap<>();
+				map.put("employeeName", emp.getName());
+				map.put("employeeNumber", i);
+				map.put("vehicleId", emp.getVehicle()==null?-1:emp.getVehicle().getId());
+				map.put("employeeId", emp.getId());
+				map.put("employeeLocation", emp.getLocation());
+				map.put("availableTime", emp.getAvailabilityList().get(0));
+				map.put("plannedTime", emp.getWorkIntervalAsString());
+				map.put("nextTasks", new ArrayList<>());
+				availableButNotAssigned.add(map);
+				availableEmps++;
 			}
 			else{
 				Map<String,Object> map = new HashMap<>();
@@ -251,18 +268,22 @@ public class TaskPlanningService {
 			
 			
 		});
+		updatedEmployees.addAll(availableButNotAssigned);
 		Map<String,Object> resp = new HashMap<>();
 		resp.put("taskListSize", solution.getTaskList().size());
 		resp.put("citizenList", solution.getCitizenList().size());
 		resp.put("employeeList", solution.getEmployeeList().size());
 		resp.put("locationList", solution.getLocationList().size());
 		resp.put("vehicleList", solution.getVehicleList().size());
-		resp.put("assignedEmp", updatedEmployees.size());
+		resp.put("assignedEmp", assignedEmp);
 		resp.put("unAssignEmp", unAvailableEmp.size());
 		resp.put("plannerScore", solution.getScore().toString());
+		
+		resp.put("avialableEmp", availableEmps);
 		resp.put("unassignTaskList", tasksList.size());
 		resp.put("unassignTask", tasksList);
 		resp.put("unavailableEmployees", unAvailableEmp);
+		
 		resp.put("emplyees", updatedEmployees);
 		return resp;
 	}
