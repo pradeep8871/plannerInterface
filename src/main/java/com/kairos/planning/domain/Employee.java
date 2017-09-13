@@ -8,8 +8,8 @@ import org.joda.time.Interval;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
-@PlanningEntity
 @XStreamAlias("Employee")
+//@PlanningEntity(difficultyComparatorClass = EmployeeDifficultyComparator.class)
 public class Employee extends TaskOrEmployee{
 	public Employee() {
 	}
@@ -29,7 +29,7 @@ public class Employee extends TaskOrEmployee{
 
 	private Location location;
 	private String name;
-	@PlanningVariable(valueRangeProviderRefs = {"vehicleRange"})
+	//@PlanningVariable(valueRangeProviderRefs = {"vehicleRange"},strengthComparatorClass = VehicleComparator.class)
 	private Vehicle vehicle;
 	private Set<Skill> skillSet;
 	public Set<Skill> getSkillSet() {
@@ -101,7 +101,7 @@ public class Employee extends TaskOrEmployee{
 	}
 	
 	public String toString(){
-		return "E:"+id+"-"+name+"-"+getAvailableMinutes();//+skillSet+"-
+		return "E:"+id+"-"+name+"-"+getAvailabilityList();//+skillSet+"-
 	}
 	/*public Affinity getAffinity(Citizen citizen) {
         Affinity affinity = affinityMap.get(citizen);
@@ -135,12 +135,11 @@ public class Employee extends TaskOrEmployee{
         if(nextTask!=null){
             Task currentTask=nextTask;
             DateTime start = currentTask.getIntervalIncludingArrivalAndWaiting().getStart();
-            while(currentTask!=null){
-                if(currentTask.nextTask==null) break;
+            while(currentTask.nextTask!=null){
                 currentTask=currentTask.nextTask;
-
             }
             DateTime end = currentTask.getReachBackUnitInterval().getEnd();
+            //TODO Interval check
             if(start.isBefore(end)){
                 workInterval= new Interval(start,end);
             }
@@ -148,7 +147,7 @@ public class Employee extends TaskOrEmployee{
         return workInterval;
     }
     public String getWorkIntervalAsString(){
-	    return getWorkInterval()==null?"null":getWorkInterval().getStart().toString("HH:mm")+"-"+getWorkInterval().getEnd().toString("HH:mm");
+	    return getWorkInterval()==null?"Problematic work interval":getWorkInterval().getStart().toString("HH:mm")+"-"+getWorkInterval().getEnd().toString("HH:mm");
     }
     public boolean workIntervalOverlapsWithSameVehicle(Employee otherEmployee){
     	boolean overlaps=false;

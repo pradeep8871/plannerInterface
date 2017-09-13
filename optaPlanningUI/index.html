@@ -56,6 +56,10 @@
                                 <td>6.UnAssigned-Employees</td>
                                 <td>{{unAssignEmp}}</td>
                             </tr>
+                            <tr>
+                                <td>6.Optaplanner Score</td>
+                                <td>{{plannerScore}}</td>
+                            </tr>
 
                         </tbody>
                     </table>
@@ -64,7 +68,7 @@
                 <div class="staff-info-box clearfix" ng-show="!mapShow">
                     <ul class="staff-list clearfix" ng-repeat="emp in employees">
                         <li>
-                            <!--<a><span class="number" ng-click="getMapByEmployee();">{{emp.employeeNumber}}</span></a>-->
+                            <a><span class="number">{{emp.employeeNumber}}</span></a>
                             <div class="staff-name"> <!--<a><span ng-click="getMap();">pradeep</span></a>-->
                                 <a><span ng-click="getMap(emp);">{{emp.employeeName}}</span></a>, V={{emp.vehicleId}},
                                 <span>{{emp.availableTime.startTimeString}} - {{emp.availableTime.endTimeString}}, TaskAssigned = {{emp.nextTasks.length}}</span>
@@ -79,8 +83,8 @@
                                     </div><!--//task.brokenhardcontrants-->
                                     <div class="task-box" ng-class="{'taskHardContraints': task.brokenhardcontrants}">
                                         <span ng-show="false">{{task.hardcontrants}}</span>
-                                        <span class="task-time">A:{{task.startTime | date:'dd-MMM|| HH:mm:ss'}} - {{task.endTime | date:'dd-MMM|| HH:mm:ss'}}</span>
-										<span class="task-time2">P:{{task.plannedStartTime | date:'dd-MMM|| HH:mm:ss'}} - {{task.plannedEndTime | date:'dd-MMM|| HH:mm:ss'}}</span>
+                                        <span class="task-time">A:{{millisToUTCDate(task.startTime) | date:'dd-MMM|| HH:mm:ss' }} - {{millisToUTCDate(task.endTime) | date:'dd-MMM|| HH:mm:ss'}}</span>
+										<span class="task-time2">P:{{millisToUTCDate(task.plannedStartTime) | date:'dd-MMM|| HH:mm:ss'}} - {{millisToUTCDate(task.plannedEndTime) | date:'dd-MMM|| HH:mm:ss'}}</span>
                                         <span class="task-id">{{task.id}},{{task.taskName}},{{task.citizenName}}</span>
                                         <span ng-show="false">{{task.taskLocation.latitude}}-{{task.taskLocation.longitude}}</span>
                                     </div>
@@ -118,8 +122,8 @@
                                     <td>{{task.taskName}}</td>
                                     <td>{{task.taskLocation.latitude}},{{task.taskLocation.longitude}}</td>
                                     <td>{{task.citizenName}}</td>
-                                    <td>{{task.startTime | date:'HH:mm:ss'}}</td>
-                                    <td>{{task.endTime | date:'HH:mm:ss'}}</td>
+                                    <td>{{millisToUTCDate(task.startTime) | date:'HH:mm:ss'}}</td>
+                                    <td>{{millisToUTCDate(task.endTime) | date:'HH:mm:ss'}}</td>
                                     <td>{{getReasonByTask(task.hardcontrants)}}</td>
                                 </tr>
                             </tbody>

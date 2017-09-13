@@ -14,9 +14,7 @@ import com.kairos.planning.domain.Task;
 
 @Repository
 public class OptaRepository{
-	static{
-        System.setProperty("user.timezone", "UTC");
-    }
+	
 	@Autowired
 	MongoTemplate mongoTemplate;
 

@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +47,10 @@ public class TaskPlanningService {
 	private GraphHopperService graphHopperService;
 	@Autowired
 	KieService optaPlannerService;
-
+	static{
+		java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+	    System.setProperty("user.timezone", "UTC");
+	}
 	public void saveData() {
 
 		// repository.save();
@@ -185,7 +191,9 @@ public class TaskPlanningService {
 		XStream xstream = new XStream();
 		xstream.processAnnotations(TaskPlanningSolution.class);
 		xstream.ignoreUnknownElements();
-		xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
+		//xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
+		xstream.setMode(XStream.ID_REFERENCES);
+		
 		TaskPlanningSolution solution = (TaskPlanningSolution) xstream.fromXML(xml);
 		/*
 		 * PlanningProblem planningProblem = getPlanningProblemByid(id);
@@ -233,6 +241,16 @@ public class TaskPlanningService {
 				tasksList.add(map);
 			}
 		}
+		Collections.sort(tasksList, new Comparator<Map>(){
+
+			@Override
+			public int compare(Map arg0, Map arg1) {
+				//((Date)arg0.get("startTime"))
+				return ((Date)arg0.get("startTime")).compareTo((Date)arg1.get("startTime"));
+			}
+			
+			
+		});
 		Map<String,Object> resp = new HashMap<>();
 		resp.put("taskListSize", solution.getTaskList().size());
 		resp.put("citizenList", solution.getCitizenList().size());
@@ -241,6 +259,7 @@ public class TaskPlanningService {
 		resp.put("vehicleList", solution.getVehicleList().size());
 		resp.put("assignedEmp", updatedEmployees.size());
 		resp.put("unAssignEmp", unAvailableEmp.size());
+		resp.put("plannerScore", solution.getScore().toString());
 		resp.put("unassignTaskList", tasksList.size());
 		resp.put("unassignTask", tasksList);
 		resp.put("unavailableEmployees", unAvailableEmp);

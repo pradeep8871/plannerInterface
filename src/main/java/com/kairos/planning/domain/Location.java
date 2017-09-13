@@ -14,9 +14,9 @@ public class Location {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	private String name;
-    private double latitude;
-    private double longitude;
+	protected String name;
+    protected double latitude;
+    protected double longitude;
     private List<LocationInfo> locationInfos;
     
     
@@ -79,16 +79,6 @@ public class Location {
                 (latitudeDifference * latitudeDifference) + (longitudeDifference * longitudeDifference))).longValue();*//*
         long distance= distance(location.latitude,latitude,location.longitude,longitude,0,0);
         return distance;*/
-		if(otherLocation==null){
-			System.out.println("**********");
-		}
-		if(otherLocation.getId()==null){
-			System.out.println("*****iiiiiddddd*****");
-		}
-		
-		if(this.getId()==null){
-			System.out.println("****THISSSS*iiiiiddddd*****");
-		}
         if(otherLocation.getId().equals(this.getId())) return 0;
         LocationInfo otherLocationInfo = null;
         for(LocationInfo info:getLocationInfos()){

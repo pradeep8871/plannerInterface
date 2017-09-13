@@ -2,6 +2,7 @@ package com.kairos.planning.domain;
 
 import java.util.Arrays;
 
+//import com.kairos.planning.executioner.TaskPlanningGenerator;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 @XStreamAlias("Task")
 //@PlanningEntity(difficultyComparatorClass = TaskDifficultyComparator.class)
 public class Task  extends TaskOrEmployee {
+	public static final int DRIVING_TIME_MULTIPLIER = 1;
 	Logger log= LoggerFactory.getLogger(this.getClass());
 	private TaskType taskType;
 	// Planning variables: changes during planning, between score calculations.
@@ -93,9 +95,9 @@ public class Task  extends TaskOrEmployee {
 	 //      sources = {@PlanningVariableReference(variableName = "previousTaskOrVehicle")})
     private Route route;
 	//@XStreamAlias("initialStartTime")
-   // @XStreamConverter(TaskPlanningGenerator.JodaTimeConverter.class)
+    //@XStreamConverter(TaskPlanningGenerator.JodaTimeConverter.class)
 	private DateTime initialStartTime;
-   // @XStreamConverter(TaskPlanningGenerator.JodaTimeConverter.class)
+    //@XStreamConverter(TaskPlanningGenerator.JodaTimeConverter.class)
     private DateTime initialEndTime;
 
 	/*
@@ -114,8 +116,8 @@ public class Task  extends TaskOrEmployee {
     public void setPlannedStartTime(DateTime plannedStartTime) {
         this.plannedStartTime = plannedStartTime;
     }
- //   @CustomShadowVariable(variableListenerClass = StartTimeVariableListener.class,
-         //  sources = {@PlanningVariableReference(variableName = "previousTaskOrEmployee")})
+    //@CustomShadowVariable(variableListenerClass = StartTimeVariableListener.class,
+      //     sources = {@PlanningVariableReference(variableName = "previousTaskOrEmployee")})
     private DateTime plannedStartTime;
 
 
@@ -144,7 +146,8 @@ public class Task  extends TaskOrEmployee {
         return new Interval(getEarliestStartTime(),getLatestStartTime());
     }
     public boolean isPlannedInPossibleInterval(){
-	    return getPossibleStartInterval().contains(getPlannedStartTime());
+	    return getPossibleStartInterval().contains(getPlannedStartTime()) || getPossibleStartInterval().getStart().isEqual(getPlannedStartTime())
+                || getPossibleStartInterval().getEnd().isEqual(getPlannedStartTime());
     }
 
 	private boolean locked;
@@ -202,7 +205,8 @@ public class Task  extends TaskOrEmployee {
     public String getLabel(){
     	return id+"_"+priority+"_("+initialStartTime.toString("HH:mm")+"_"+initialEndTime.toString("HH:mm")+")P:"
 				+plannedStartTime.toString("HH:mm")+"_"+getPlannedEndTime().toString("HH:mm")+"PiD:"+","+getIntervalIncludingArrivalAndWaiting().getStart().toString("HH:mm")+"_"+
-                getIntervalIncludingArrivalAndWaiting().getEnd().toString("HH:mm")+"Di:"+getDrivingMinutesFromPreviousTaskOrEmployee();
+                getIntervalIncludingArrivalAndWaiting().getEnd().toString("HH:mm")+",Dis:"+getDrivingMinutesFromPreviousTaskOrEmployee()+",wait:"
+				+getWaitingMinutes();
     }
 
 	public void setDuration(Integer duration) {
@@ -230,8 +234,9 @@ public class Task  extends TaskOrEmployee {
 	public Interval getInitialInterval(){
     	return new Interval(new DateTime(initialStartTime),new DateTime(initialEndTime));
 	}
-		public Integer getWaitingMinutes(){
-			return getPlannedReachingTime().isAfter(getEarliestStartTime())?0:new Interval(getPlannedReachingTime(),getEarliestStartTime()).toDuration().toStandardMinutes().getMinutes();
+	public Integer getWaitingMinutes(){
+			return getPlannedReachingTime().isAfter(getEarliestStartTime())?0
+                    :new Interval(getPlannedReachingTime(),getEarliestStartTime()).toDuration().toStandardMinutes().getMinutes();
 	}
 	public Interval getIntervalIncludingArrivalAndWaiting(){
 
@@ -296,7 +301,7 @@ public class Task  extends TaskOrEmployee {
 		/*if(this.getId().equals(1979693l) && previousTaskOrEmployee instanceof  Task && ((Task)previousTaskOrEmployee).getId().equals(2047751l)){
 			System.out.println("?????????"+getDistanceFrom(previousTaskOrEmployee)+","+employee.getVehicle() .getSpeedKmpm()+","+getDistanceFrom(previousTaskOrEmployee) / employee.getVehicle() .getSpeedKmpm());
 		}*/
-		int drivingTime = (int) ((getDistanceFrom(previousTaskOrEmployee) / employee.getVehicle() .getSpeedKmpm())*10);
+		int drivingTime = (int) Math.ceil((getDistanceFrom(previousTaskOrEmployee) / employee.getVehicle() .getSpeedKmpm())* DRIVING_TIME_MULTIPLIER);
 		return drivingTime;
 	}
 	public DateTime getPlannedReachingTime(){
@@ -311,7 +316,7 @@ public class Task  extends TaskOrEmployee {
 		return previousTaskOrEmployee.getLocation().getDistanceFrom(this.getLocation());
 	}
 	public String toString(){
-		return "T:"+id+"-"+priority+"-"+getDuration()+"-";//+"-"+taskType.getRequiredSkillList();
+		return "T:"+id+"-"+priority+"-"+getDuration()+"-"+location.name;//+"-"+taskType.getRequiredSkillList();
 	}
 	public int getMissingSkillCount() {
         if (employee==null) {

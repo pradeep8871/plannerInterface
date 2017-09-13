@@ -19,8 +19,7 @@ angular.module('myApp', []).controller('namesCtrl', function($scope,$http) {
             $scope.unassigntasksList = response.data.DATA.unassignTaskList;
             $scope.assignedEmp = response.data.DATA.assignedEmp;
             $scope.unAssignEmp = response.data.DATA.unAssignEmp;
-            //          $scope.problemIds = response.data.DATA;
-            //            $scope.problemId = $scope.problemIds[0]; 
+            $scope.plannerScore = response.data.DATA.plannerScore;
         });
     };
 
@@ -45,6 +44,14 @@ angular.module('myApp', []).controller('namesCtrl', function($scope,$http) {
         }
         var map = new google.maps.Map(document.getElementById("map"), mapOptions);
     };
+	var toUTCDate = function(date){
+    var _utc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),  date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+    return _utc;
+  };
+
+  $scope.millisToUTCDate = function(millis){
+    return toUTCDate(new Date(millis));
+  };
 
 
     $scope.getMap = function(employee){
