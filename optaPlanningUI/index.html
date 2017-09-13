@@ -67,7 +67,9 @@
                             <!--<a><span class="number" ng-click="getMapByEmployee();">{{emp.employeeNumber}}</span></a>-->
                             <div class="staff-name"> <!--<a><span ng-click="getMap();">pradeep</span></a>-->
                                 <a><span ng-click="getMap(emp);">{{emp.employeeName}}</span></a>, V={{emp.vehicleId}},
-                                <span>{{emp.availableTime.startTimeString}} - {{emp.availableTime.endTimeString}}, TaskAssigned = {{emp.nextTasks.length}}</span><span ng-show="false">{{emp.employeeLocation.latitude}}-{{emp.employeeLocation.longitude}}</span>
+                                <span>{{emp.availableTime.startTimeString}} - {{emp.availableTime.endTimeString}}, TaskAssigned = {{emp.nextTasks.length}}</span>
+								<span>Planned Period: {{emp.plannedTime}}</span>
+								<span ng-show="false">{{emp.employeeLocation.latitude}}-{{emp.employeeLocation.longitude}}</span>
                             </div>
 
                             <ul class="staff-task-list" ng-repeat="task in emp.nextTasks">
@@ -77,7 +79,7 @@
                                     </div><!--//task.brokenhardcontrants-->
                                     <div class="task-box" ng-class="{'taskHardContraints': task.brokenhardcontrants}">
                                         <span ng-show="false">{{task.hardcontrants}}</span>
-                                        <span class="task-time">{{task.startTime | date:'dd-MMM|| HH:mm:ss'}} - {{task.endTime | date:'dd-MMM|| HH:mm:ss'}}</span>
+                                        <span class="task-time">A:{{task.startTime | date:'dd-MMM|| HH:mm:ss'}} - {{task.endTime | date:'dd-MMM|| HH:mm:ss'}}</span>
 										<span class="task-time2">P:{{task.plannedStartTime | date:'dd-MMM|| HH:mm:ss'}} - {{task.plannedEndTime | date:'dd-MMM|| HH:mm:ss'}}</span>
                                         <span class="task-id">{{task.id}},{{task.taskName}},{{task.citizenName}}</span>
                                         <span ng-show="false">{{task.taskLocation.latitude}}-{{task.taskLocation.longitude}}</span>

@@ -206,6 +206,7 @@ public class TaskPlanningService {
 			map.put("employeeId", emp.getId());
 			map.put("employeeLocation", emp.getLocation());
 			map.put("availableTime", emp.getAvailabilityList().get(0));
+			map.put("plannedTime", emp.getWorkIntervalAsString());
 			map.put("nextTasks", tasks);
 			tasks = new ArrayList<>();
 			updatedEmployees.add(map);
