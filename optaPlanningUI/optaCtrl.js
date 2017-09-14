@@ -24,7 +24,7 @@ angular.module('myApp', []).controller('namesCtrl', function($scope,$http) {
             $scope.plannerScore = response.data.DATA.plannerScore;
         });
     };
-
+    $scope.counter=0;
     $scope.getStatusClass = function(value){
         if(value) return "taskHardContraints";
 
