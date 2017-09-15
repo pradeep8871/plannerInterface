@@ -1,4 +1,4 @@
-package com.kairos.planning.domain;
+package com.planning.domain;
 
 import org.springframework.data.annotation.Id;
 

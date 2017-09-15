@@ -1,4 +1,4 @@
-package com.opta.demo.todo;
+package com.planning.service;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.opta.demo.appConfig.StaticField;
+import com.planning.appConfig.StaticField;
 
 @Service
 public class KieService {

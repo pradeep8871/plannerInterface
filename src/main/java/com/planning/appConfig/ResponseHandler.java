@@ -1,4 +1,4 @@
-package com.opta.demo.appConfig;
+package com.planning.appConfig;
 
 import java.util.Date;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.opta.demo.todo;
+package com.planning.service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,9 +24,7 @@ import com.kairos.planning.domain.AvailabilityRequest;
 import com.kairos.planning.domain.Citizen;
 import com.kairos.planning.domain.Employee;
 import com.kairos.planning.domain.Location;
-import com.kairos.planning.domain.LocationDistance;
 import com.kairos.planning.domain.LocationInfo;
-import com.kairos.planning.domain.PlanningProblem;
 import com.kairos.planning.domain.Skill;
 import com.kairos.planning.domain.Task;
 import com.kairos.planning.domain.TaskType;
@@ -34,6 +32,9 @@ import com.kairos.planning.domain.UnavailabilityRequest;
 import com.kairos.planning.domain.Vehicle;
 import com.kairos.planning.enums.PlanningStatus;
 import com.kairos.planning.solution.TaskPlanningSolution;
+import com.planning.domain.LocationDistance;
+import com.planning.domain.PlanningProblem;
+import com.planning.repository.OptaRepository;
 import com.thoughtworks.xstream.XStream;
 
 @Service
@@ -191,8 +192,8 @@ public class TaskPlanningService {
 		XStream xstream = new XStream();
 		xstream.processAnnotations(TaskPlanningSolution.class);
 		xstream.ignoreUnknownElements();
-		//xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
-		xstream.setMode(XStream.ID_REFERENCES);
+		xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
+		//xstream.setMode(XStream.ID_REFERENCES);
 		
 		TaskPlanningSolution solution = (TaskPlanningSolution) xstream.fromXML(xml);
 		/*

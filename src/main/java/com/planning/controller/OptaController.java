@@ -1,6 +1,5 @@
-package com.opta.demo.todo;
+package com.planning.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -15,7 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.opta.demo.appConfig.ResponseHandler;
+import com.planning.appConfig.OptaNotFoundException;
+import com.planning.appConfig.ResponseHandler;
+import com.planning.service.GraphHopperService;
+import com.planning.service.KieService;
+import com.planning.service.TaskPlanningService;
 
 @RestController
 @RequestMapping("/api/opta")
@@ -32,14 +35,7 @@ public final class OptaController {
 
 	@RequestMapping(value = "/submitXml", method = RequestMethod.POST)
 	Map<String, Object> submitXml(@RequestBody Map requestData) {
-		/*
-		 * if(!requestData.containsKey("id") ||
-		 * (String)requestData.get("id")=="" || !requestData.containsKey("xml")
-		 * || (String)requestData.get("xml")=="") return
-		 * ResponseHandler.generateResponse("planning id doesn't exist",
-		 * HttpStatus.NOT_ACCEPTABLE, true, optaservice.getAllPlanning());
-		 * optaservice.submitXmltoKie(requestData);
-		 */return ResponseHandler.generateResponse("save Data sucessFully", HttpStatus.ACCEPTED, false,
+		return ResponseHandler.generateResponse("save Data sucessFully", HttpStatus.ACCEPTED, false,
 				optaservice.getsolutionbyXml((String) requestData.get("xml")));// optaservice.getAllPlanning());
 	}
 
@@ -63,7 +59,6 @@ public final class OptaController {
 
 	@RequestMapping(value = "/deleteKieContainer", method = RequestMethod.POST)
 	Map<String, Object> deleteKieContainer(@RequestParam String id) {
-		// optaPlannerService.deleteKieContainer(id);
 		return ResponseHandler.generateResponse("save Data sucessFully", HttpStatus.ACCEPTED, false, null);
 	}
 
@@ -72,14 +67,6 @@ public final class OptaController {
 		graphHopperService.readLocations();
 		return ResponseHandler.generateResponse("save Data sucessFully", HttpStatus.ACCEPTED, false, null);
 	}
-
-	/*
-	 * @RequestMapping(value = "/makeKieContainer", method = RequestMethod.POST)
-	 * Map<String ,Object> makeKieContainer() {
-	 * optaPlannerService.makeKieContainer(); return
-	 * ResponseHandler.generateResponse("save Data sucessFully",
-	 * HttpStatus.ACCEPTED, false, null); }
-	 */
 
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.NOT_FOUND)

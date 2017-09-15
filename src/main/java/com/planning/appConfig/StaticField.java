@@ -1,4 +1,4 @@
-package com.opta.demo.appConfig;
+package com.planning.appConfig;
 
 public class StaticField {
 	

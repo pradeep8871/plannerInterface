@@ -1,4 +1,4 @@
-package com.opta.demo.todo;
+package com.planning.service;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -17,9 +17,10 @@ import com.graphhopper.directions.api.client.api.MatrixApi;
 import com.graphhopper.directions.api.client.model.GeocodingResponse;
 import com.graphhopper.directions.api.client.model.MatrixResponse;
 import com.kairos.planning.domain.Location;
-import com.kairos.planning.domain.LocationDistance;
 import com.kairos.planning.domain.LocationInfo;
 import com.kairos.planning.solution.TaskPlanningSolution;
+import com.planning.domain.LocationDistance;
+import com.planning.repository.OptaRepository;
 import com.thoughtworks.xstream.XStream;
 
 @Service

@@ -1,6 +1,8 @@
-package com.kairos.planning.domain;
+package com.planning.domain;
 
 import org.springframework.data.annotation.Id;
+
+import com.kairos.planning.domain.Location;
 
 public class LocationDistance {
 	

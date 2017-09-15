@@ -1,8 +1,8 @@
-package com.opta.demo.todo;
+package com.planning.domain;
 
 import org.springframework.data.annotation.Id;
 
-public final class Todo {
+public final class TestTodo {
 	
     @Id
     private String id;
@@ -11,7 +11,7 @@ public final class Todo {
 
     private String title;
 
-    public Todo() {}
+    public TestTodo() {}
 
     public String getId() {
         return id;

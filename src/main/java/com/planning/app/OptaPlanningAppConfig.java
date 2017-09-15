@@ -1,4 +1,4 @@
-package com.opta.demo;
+package com.planning.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

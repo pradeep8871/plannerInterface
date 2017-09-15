@@ -1,4 +1,4 @@
-package com.opta.demo.todo;
+package com.planning.repository;
 
 import java.util.List;
 
@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.planning.domain.Task;
 
 
 
@@ -36,17 +35,17 @@ public class OptaRepository{
     	return mongoTemplate.findOne(query, className);
     };
     
-    Object findOne(String field,String data,Class className){
+    public Object findOne(String field,String data,Class className){
     	Query query = new Query(Criteria.where(field).is(data));
     	return mongoTemplate.findOne(query, className);
     };
 
-    Object save(Object object){
+    public Object save(Object object){
 		mongoTemplate.save(object);
 		return object;
     }
     
-    void saveList(List object){
+    public void saveList(List object){
     	for (Object object2 : object) {
 			mongoTemplate.save(object2);
 		}
